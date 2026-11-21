@@ -8,9 +8,9 @@ const SPREADSHEET_ID = "1C2zEgZLgSyGdD_Ef9gEezVYredxy1-SgYfHpOPcEV7o";
 const SHEET_TX_NAME = "Transactions";
 const SHEET_CFG_NAME = "Config";
 
-// LINE Token ที่ผู้ใช้ระบุ (หรือสามารถระบุใน Sheet Config คีย์ line_token ได้เช่นกัน)
-const LINE_CHANNEL_ACCESS_TOKEN = "8c7eb36f98c741c9a320ee5aa900766e";
-const LINE_TARGET_ID = ""; // หากว่างไว้ ระบบจะจับ Group ID ให้อัตโนมัติเมื่อดึงบอทเข้ากลุ่ม
+// LINE Token และ Target Group ID สำหรับส่งการแจ้งเตือน
+const LINE_CHANNEL_ACCESS_TOKEN = "5CXBip5j+PV/RTF6HTSc+g+15NtALJt4emUt12ptIJEJ8dWznxrNo1e4CAPsAbQkemEF3jwQ1PELdi4HzGy0rVdH4uAwX79sNHH624M5lMsHgVeBJUDj+LurDAxKB3q/KDTEIeK+crYYTJwvMHfQ9wdB04t89/1O/w1cDnyilFU=";
+const LINE_TARGET_ID = "C6d5e97065697f13cc73445b5f1ac32f3";
 
 /**
  * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
@@ -364,11 +364,11 @@ function notifyLineBatch(items, ss) {
   const payerKey = items[0].payerKey;
   let payerName = "ผู้ใช้";
   if (cfg[payerKey] && cfg[payerKey].name) {
-    payerName = cfg[payerKey].name;
+    payerName = (cfg[payerKey].avatar ? cfg[payerKey].avatar + " " : "") + cfg[payerKey].name;
   } else if (payerKey === "user1") {
     payerName = "บอส";
   } else if (payerKey === "user2") {
-    payerName = "คู่หู";
+    payerName = "นิว";
   }
 
   let msg = "🌙 Lunar — บันทึกรายจ่ายใหม่!\n";
