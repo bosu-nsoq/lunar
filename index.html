@@ -1242,7 +1242,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzjWwEBRvkkElpXAhdznVa3ZXg9ShrvI93UTiyh9kZvOswqDiaWeO68azxmqCvo8X5y/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzbeXQBdCT41PJdj-P8j2eWFbsWWvck97d2WF9zyCscS1Q1jTUWf6qmAnsT7tkJeyUa/exec';
 
     // Default configuration
     let appConfig = {
@@ -1283,8 +1283,8 @@
         if (savedCfg) {
           appConfig = Object.assign(appConfig, JSON.parse(savedCfg));
         }
-        // Always ensure valid GAS URL
-        if (!appConfig.gasUrl) appConfig.gasUrl = DEFAULT_GAS_URL;
+        // Always ensure latest GAS URL
+        appConfig.gasUrl = DEFAULT_GAS_URL;
 
         const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
         if (savedItems) {

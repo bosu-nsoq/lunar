@@ -69,6 +69,11 @@ function doGet(e) {
     const ss = getSpreadsheet();
     initSheets(ss);
 
+    if (action === "testLine") {
+      const res = testLineSendDirect(ss);
+      return createJsonResponse(res);
+    }
+
     if (action === "getAll") {
       const txData = getTransactionsData(ss);
       const cfgData = getConfigData(ss);
@@ -288,6 +293,35 @@ function getLineTargetId(ss) {
   }
   const cfg = getConfigData(ss);
   return (cfg && cfg["line_target_id"]) ? cfg["line_target_id"] : "";
+}
+
+function testLineSendDirect(ss) {
+  try {
+    const token = getLineToken(ss);
+    const targetId = getLineTargetId(ss);
+    if (!token || !targetId) {
+      return { status: "missing_token_or_target", token: !!token, targetId: !!targetId };
+    }
+    const response = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      payload: JSON.stringify({
+        to: targetId,
+        messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนสำเร็จ! ✨" }]
+      }),
+      muteHttpExceptions: true
+    });
+    return {
+      status: "success",
+      httpCode: response.getResponseCode(),
+      responseBody: response.getContentText()
+    };
+  } catch (err) {
+    return { status: "error", error: err.toString() };
+  }
 }
 
 /**
