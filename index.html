@@ -5,26 +5,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   
-  <title>NB - บันทึกรายจ่าย 2 คน</title>
+  <title>Lunar</title>
   
   <!-- Open Graph & Meta tags -->
-  <meta name="description" content="แอปบันทึกรายจ่ายและเคลียร์หนี้สำหรับ 2 คน">
-  <meta property="og:title" content="NB - บันทึกรายจ่าย 2 คน">
-  <meta property="og:description" content="แอปบันทึกรายจ่ายและเคลียร์หนี้สำหรับ 2 คน จอไม่เลื่อน เน้นไอคอน">
-  <meta property="og:image" content="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <meta name="description" content="สำหรับใช้บันทึกรายจ่าย">
+  <meta property="og:title" content="Lunar">
+  <meta property="og:description" content="สำหรับใช้บันทึกรายจ่าย">
+  <meta property="og:image" content="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bosu-nsoq.github.io/nb/">
 
   <!-- Favicon & Apple iOS Standalone App Meta Tags -->
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/Kc6BXB17/NB.png">
-  <link rel="shortcut icon" type="image/png" href="https://i.postimg.cc/Kc6BXB17/NB.png">
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/Kc6BXB17/NB.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
+  <link rel="shortcut icon" type="image/png" href="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#FF8DA1">
+  <meta name="theme-color" content="#0B0C10">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="NB">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lunar">
 
   <!-- Google Font: Mali -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,25 +33,25 @@
 
   <style>
     :root {
-      --pink-primary: #FF758F;
-      --pink-dark: #E05370;
-      --pink-light: #FFE5EC;
-      --pink-soft: #FFF0F5;
-      --pink-border: #FFCCD5;
-      --pink-gradient: linear-gradient(135deg, #FF758F, #FF9A9E);
-      --bg-page: #FFF5F7;
-      --card-white: #FFFFFF;
-      --card-alt: #FFF9FA;
-      --text-main: #3D3A45;
-      --text-muted: #7A7585;
-      --accent-mint: #52B788;
-      --accent-mint-light: #D8F3DC;
+      --lunar-gold: #FFD166;
+      --lunar-gold-light: #FFEAA7;
+      --lunar-gold-dark: #E5B842;
+      --lunar-black: #0B0C10;
+      --lunar-dark: #12141C;
+      --lunar-dark-trans: rgba(18, 20, 28, 0.75);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-bg-hover: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 209, 102, 0.22);
+      --glass-border-subtle: rgba(255, 255, 255, 0.12);
+      --text-white: #FFFFFF;
+      --text-mist: #F1F5F9;
+      --text-muted: #94A3B8;
+      --accent-mint: #06D6A0;
       --danger: #FF6B6B;
       --radius-lg: 18px;
       --radius-md: 14px;
       --radius-sm: 10px;
-      --shadow-soft: 0 4px 14px rgba(255, 117, 143, 0.08);
-      --shadow-float: 0 8px 24px rgba(255, 117, 143, 0.16);
+      --gold-glow: 0 0 16px rgba(255, 209, 102, 0.25);
     }
 
     * {
@@ -64,7 +64,7 @@
       user-select: none;
     }
 
-    /* ล็อกหน้าจอแนวตั้งให้นิ่งสนิท ไม่เลื่อนไปมา */
+    /* ล็อกการเลื่อนของหน้าจอทั้งหมด (100dvh Fixed Viewport) */
     html, body {
       width: 100%;
       height: 100vh;
@@ -73,8 +73,12 @@
       position: fixed;
       top: 0;
       left: 0;
-      background: var(--bg-page);
-      color: var(--text-main);
+      background: #0B0C10;
+      background-image: 
+        radial-gradient(circle at 85% 15%, rgba(255, 209, 102, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 15% 85%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+        linear-gradient(180deg, #0B0C10 0%, #12141C 100%);
+      color: var(--text-white);
       overscroll-behavior: none;
       display: flex;
       justify-content: center;
@@ -86,22 +90,34 @@
       max-width: 480px;
       height: 100%;
       max-height: 100dvh;
-      background: var(--bg-page);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 35px rgba(255, 154, 158, 0.2);
+      background: transparent;
     }
 
-    /* Header Bar สลับชมพูพาสเทลและขาว */
+    /* Glassmorphism Card Style (กระจกด้าน โปร่งใส) */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Header Bar */
     .app-header {
-      background: #FFFFFF;
+      background: rgba(11, 12, 16, 0.8);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1.5px solid var(--pink-border);
+      border-bottom: 1px solid var(--glass-border);
       flex-shrink: 0;
       z-index: 10;
       white-space: nowrap;
@@ -110,7 +126,7 @@
     .brand-box {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       cursor: pointer;
     }
     .brand-logo-img {
@@ -118,12 +134,13 @@
       height: 28px;
       border-radius: 8px;
       object-fit: cover;
-      box-shadow: 0 2px 6px rgba(255, 117, 143, 0.25);
+      box-shadow: 0 0 10px rgba(255, 209, 102, 0.3);
     }
     .brand-title {
       font-size: 17px;
       font-weight: 700;
-      color: var(--pink-dark);
+      color: var(--lunar-gold);
+      letter-spacing: 0.5px;
       white-space: nowrap;
     }
 
@@ -132,23 +149,23 @@
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 20px;
-      background: var(--pink-light);
-      color: var(--pink-dark);
+      background: rgba(255, 209, 102, 0.12);
+      color: var(--lunar-gold);
+      border: 1px solid rgba(255, 209, 102, 0.35);
       white-space: nowrap;
       max-width: 160px;
       overflow: hidden;
       text-overflow: ellipsis;
       cursor: pointer;
-      border: 1px solid var(--pink-border);
     }
 
     .user-pill-btn {
       display: flex;
       align-items: center;
       gap: 5px;
-      background: var(--pink-soft);
-      border: 1px solid var(--pink-border);
-      color: var(--pink-dark);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border-subtle);
+      color: var(--text-white);
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 12px;
@@ -159,7 +176,7 @@
     }
     .user-pill-btn:active { transform: scale(0.95); }
 
-    /* Main View Area */
+    /* Main Container (Scroll locked inside view) */
     .app-main {
       flex: 1;
       display: flex;
@@ -186,67 +203,32 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Cards - โทนขาวสลับชมพูพาสเทล */
-    .card-white {
-      background: var(--card-white);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      border: 1.5px solid var(--pink-border);
-      box-shadow: var(--shadow-soft);
-    }
-    .card-pink {
-      background: var(--card-alt);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      border: 1.5px solid var(--pink-border);
-      box-shadow: var(--shadow-soft);
-    }
-
-    /* Payer Selector Toggle */
-    .payer-toggle {
-      display: flex;
-      background: #FFE8ED;
-      border-radius: 12px;
-      padding: 3px;
-      gap: 4px;
-    }
-    .payer-btn {
-      flex: 1;
+    /* Active Recorder Badge (เอาส่วนใครจ่ายออก ให้คนล็อกอินเป็นคนบันทึก) */
+    .recorder-status-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 7px 8px;
-      border-radius: 10px;
-      border: none;
-      background: transparent;
-      font-size: 12.5px;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: rgba(255, 209, 102, 0.08);
+      border: 1px solid rgba(255, 209, 102, 0.25);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--lunar-gold);
       font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .payer-btn.active {
-      background: #FFFFFF;
-      color: var(--pink-dark);
-      font-weight: 700;
-      box-shadow: 0 2px 6px rgba(255, 117, 143, 0.15);
     }
 
     /* Thai Date & Time Row */
     .datetime-bar {
       display: flex;
       gap: 8px;
-      margin-top: 6px;
     }
     .dt-wrap {
       position: relative;
       flex: 1;
       display: flex;
       align-items: center;
-      background: #FFFFFF;
-      border: 1.5px solid var(--pink-border);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border-subtle);
       border-radius: 12px;
       padding: 6px 10px;
     }
@@ -254,7 +236,7 @@
     .dt-text {
       font-size: 12.5px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--text-white);
       width: 100%;
       border: none;
       background: transparent;
@@ -276,56 +258,56 @@
       opacity: 0; cursor: pointer;
     }
 
-    /* Pop-up Category Button (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ) */
+    /* Category Trigger (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ) */
     .cat-popup-trigger {
       display: flex;
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      background: var(--pink-soft);
-      border: 1.5px dashed var(--pink-primary);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
       border-radius: 14px;
       padding: 8px 14px;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .cat-popup-trigger:active { transform: scale(0.98); background: var(--pink-light); }
+    .cat-popup-trigger:active { transform: scale(0.98); background: rgba(255, 209, 102, 0.1); }
     .cat-current-info {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 13.5px;
       font-weight: 700;
-      color: var(--pink-dark);
+      color: var(--lunar-gold);
     }
     .cat-current-info .icon { font-size: 22px; }
     .cat-change-tag {
       font-size: 11px;
-      color: var(--pink-dark);
-      background: #FFFFFF;
+      color: var(--text-mist);
+      background: rgba(255, 255, 255, 0.08);
       padding: 3px 8px;
       border-radius: 12px;
-      border: 1px solid var(--pink-border);
+      border: 1px solid var(--glass-border-subtle);
     }
 
-    /* Amount Input Field (เอาปุ่มแนะนำยอดออกแล้ว) */
+    /* Amount Input Field */
     .amount-input-box {
       display: flex;
       align-items: center;
-      background: #FFFFFF;
-      border: 2px solid var(--pink-border);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid var(--glass-border);
       border-radius: 14px;
       padding: 6px 14px;
       transition: border-color 0.2s;
     }
     .amount-input-box:focus-within {
-      border-color: var(--pink-primary);
-      box-shadow: 0 0 0 3px rgba(255, 117, 143, 0.15);
+      border-color: var(--lunar-gold);
+      box-shadow: var(--gold-glow);
     }
     .amount-symbol {
       font-size: 22px;
       font-weight: 700;
-      color: var(--pink-primary);
+      color: var(--lunar-gold);
       margin-right: 8px;
     }
     .amount-input-ctrl {
@@ -335,14 +317,14 @@
       border: none;
       background: transparent;
       outline: none;
-      color: var(--text-main);
+      color: var(--text-white);
     }
-    .amount-input-ctrl::placeholder { color: #E2C2C9; }
+    .amount-input-ctrl::placeholder { color: #475569; }
 
-    /* Split Options */
+    /* Split Options (เอา 50:50 ออก) */
     .split-row {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
     .split-btn {
       flex: 1;
@@ -350,40 +332,41 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      padding: 7px 6px;
-      background: #FFFFFF;
-      border: 1.5px solid var(--pink-border);
+      padding: 8px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border-subtle);
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s;
     }
     .split-btn.active {
-      background: var(--pink-light);
-      border-color: var(--pink-primary);
-      color: var(--pink-dark);
+      background: rgba(255, 209, 102, 0.15);
+      border-color: var(--lunar-gold);
+      color: var(--lunar-gold);
       font-weight: 700;
+      box-shadow: 0 0 10px rgba(255, 209, 102, 0.2);
     }
 
     /* Note Input (ช่องพิมพ์หมายเหตุ) */
     .note-input-ctrl {
       width: 100%;
-      background: #FFFFFF;
-      border: 1.5px solid var(--pink-border);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border-subtle);
       border-radius: 12px;
       padding: 8px 12px;
       font-size: 12.5px;
       outline: none;
-      color: var(--text-main);
+      color: var(--text-white);
       transition: border-color 0.2s;
     }
     .note-input-ctrl:focus {
-      border-color: var(--pink-primary);
-      background: #FFF;
+      border-color: var(--lunar-gold);
+      background: rgba(255, 255, 255, 0.09);
     }
-    .note-input-ctrl::placeholder { color: #A098A8; }
+    .note-input-ctrl::placeholder { color: #64748B; }
 
     /* Button: เพิ่มเข้ารายการ */
     .btn-add-batch {
@@ -393,23 +376,24 @@
       gap: 8px;
       width: 100%;
       padding: 10px;
-      background: var(--pink-gradient);
-      color: #FFFFFF;
+      background: linear-gradient(135deg, #FFD166 0%, #F4D06F 100%);
+      color: #0B0C10;
       border: none;
       border-radius: 14px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(255, 117, 143, 0.3);
+      box-shadow: 0 4px 14px rgba(255, 209, 102, 0.3);
       transition: transform 0.15s ease;
     }
     .btn-add-batch:active { transform: scale(0.97); }
 
     /* Batch Queue Card (ตะกร้ารอส่งหลายรายการ) */
     .batch-card {
-      background: #FFFFFF;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border: 1px dashed var(--glass-border);
       border-radius: var(--radius-lg);
-      border: 2px dashed var(--pink-border);
       padding: 10px 12px;
       display: flex;
       flex-direction: column;
@@ -435,8 +419,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--pink-soft);
-      border: 1px solid var(--pink-border);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border-subtle);
       padding: 6px 10px;
       border-radius: 10px;
       font-size: 12px;
@@ -454,25 +438,25 @@
       text-overflow: ellipsis;
       max-width: 170px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--text-white);
     }
     .batch-item-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .batch-item-amt { font-weight: 700; color: var(--pink-dark); }
+    .batch-item-amt { font-weight: 700; color: var(--lunar-gold); }
     .batch-item-del {
       border: none;
       background: transparent;
-      color: #C0A8AF;
+      color: #64748B;
       cursor: pointer;
       font-size: 15px;
       padding: 2px;
     }
     .batch-item-del:hover { color: var(--danger); }
 
-    /* Button: บันทึกข้อมูลทั้งหมด (Save All) */
+    /* Button: บันทึกข้อมูลทั้งหมด */
     .btn-submit-all {
       display: flex;
       align-items: center;
@@ -480,28 +464,30 @@
       gap: 8px;
       width: 100%;
       padding: 11px;
-      background: linear-gradient(135deg, #00B894, #00CEC9);
+      background: linear-gradient(135deg, #06D6A0 0%, #118AB2 100%);
       color: #FFFFFF;
       border: none;
       border-radius: 14px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 184, 148, 0.28);
+      box-shadow: 0 4px 14px rgba(6, 214, 160, 0.28);
       transition: transform 0.15s ease;
     }
     .btn-submit-all:active { transform: scale(0.97); }
     .btn-submit-all:disabled {
-      background: #D9D4DD;
+      background: rgba(255, 255, 255, 0.08);
+      color: #64748B;
       box-shadow: none;
       cursor: not-allowed;
     }
 
-    /* รายการล่าสุด พร้อมไอคอนลบ */
+    /* รายการล่าสุด */
     .recent-section {
-      background: #FFFFFF;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-lg);
-      border: 1.5px solid var(--pink-border);
       padding: 10px 12px;
       display: flex;
       flex-direction: column;
@@ -513,18 +499,19 @@
       justify-content: space-between;
       font-size: 12px;
       font-weight: 700;
-      color: var(--pink-dark);
+      color: var(--lunar-gold);
       padding-bottom: 4px;
-      border-bottom: 1px dashed var(--pink-border);
+      border-bottom: 1px dashed var(--glass-border-subtle);
     }
     .recent-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--pink-soft);
+      background: rgba(255, 255, 255, 0.04);
       border-radius: 10px;
       padding: 6px 10px;
       font-size: 11.5px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
     .recent-left {
       display: flex;
@@ -535,7 +522,7 @@
     .recent-icon { font-size: 17px; }
     .recent-note {
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--text-white);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -547,10 +534,10 @@
       align-items: center;
       gap: 8px;
     }
-    .recent-amt { font-weight: 700; color: var(--pink-dark); }
+    .recent-amt { font-weight: 700; color: var(--lunar-gold); }
     .btn-del-item {
       border: none;
-      background: #FFE8ED;
+      background: rgba(255, 107, 107, 0.15);
       color: var(--danger);
       cursor: pointer;
       font-size: 13px;
@@ -558,19 +545,20 @@
       border-radius: 6px;
       transition: background 0.15s;
     }
-    .btn-del-item:active { background: #FFD3DC; }
+    .btn-del-item:active { background: rgba(255, 107, 107, 0.3); }
 
     /* Settlement Hero Card */
     .balance-hero {
-      background: var(--pink-gradient);
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.15) 0%, rgba(22, 26, 38, 0.8) 100%);
+      border: 1px solid var(--lunar-gold);
       border-radius: 20px;
       padding: 16px 14px;
       color: #FFF;
       text-align: center;
-      box-shadow: var(--shadow-float);
+      box-shadow: 0 0 25px rgba(255, 209, 102, 0.15);
     }
-    .balance-title { font-size: 12px; opacity: 0.95; }
-    .balance-amount { font-size: 32px; font-weight: 700; margin: 3px 0; }
+    .balance-title { font-size: 12px; color: var(--text-muted); }
+    .balance-amount { font-size: 32px; font-weight: 700; color: var(--lunar-gold); margin: 3px 0; }
     .balance-desc { font-size: 13px; font-weight: 600; }
 
     /* Bottom Navigation Bar */
@@ -580,8 +568,10 @@
       left: 0;
       width: 100%;
       height: 62px;
-      background: #FFFFFF;
-      border-top: 1.5px solid var(--pink-border);
+      background: rgba(11, 12, 16, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid var(--glass-border);
       display: flex;
       align-items: center;
       justify-content: space-around;
@@ -596,7 +586,7 @@
       justify-content: center;
       border: none;
       background: transparent;
-      color: #A098A8;
+      color: var(--text-muted);
       cursor: pointer;
       gap: 2px;
       padding: 6px 0;
@@ -604,16 +594,19 @@
     }
     .nav-item .icon { font-size: 20px; }
     .nav-item .label { font-size: 10.5px; font-weight: 600; }
-    .nav-item.active { color: var(--pink-primary); }
-    .nav-item.active .icon { transform: scale(1.1); }
+    .nav-item.active { color: var(--lunar-gold); }
+    .nav-item.active .icon { transform: scale(1.1); filter: drop-shadow(0 0 6px rgba(255, 209, 102, 0.5)); }
 
     /* ===================================================
-       FULLSCREEN PIN LOCK SCREEN (หน้ากด PIN ก่อนเข้าใช้งาน)
+       FULLSCREEN PIN LOCK SCREEN (ธีม Lunar ดำ-เหลือง-ขาว)
        =================================================== */
     .pin-lock-screen {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, #FFFFFF 0%, #FFEBF0 100%);
+      background: #0B0C10;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(255, 209, 102, 0.18) 0%, transparent 60%),
+        linear-gradient(180deg, #0B0C10 0%, #12141C 100%);
       z-index: 999;
       display: flex;
       flex-direction: column;
@@ -626,16 +619,17 @@
     .pin-lock-screen.hidden { display: none; }
 
     .pin-app-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(255, 117, 143, 0.35);
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
+      box-shadow: 0 0 25px rgba(255, 209, 102, 0.4);
       margin-bottom: 2px;
     }
     .pin-screen-title {
-      font-size: 19px;
+      font-size: 22px;
       font-weight: 700;
-      color: var(--pink-dark);
+      color: var(--lunar-gold);
+      letter-spacing: 0.5px;
     }
     .pin-screen-desc {
       font-size: 12px;
@@ -652,15 +646,15 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      border: 2px solid var(--pink-border);
-      background: #FFFFFF;
+      border: 1.5px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.05);
       transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .pin-dot.filled {
-      background: var(--pink-primary);
-      border-color: var(--pink-primary);
+      background: var(--lunar-gold);
+      border-color: var(--lunar-gold);
       transform: scale(1.2);
-      box-shadow: 0 0 10px rgba(255, 117, 143, 0.4);
+      box-shadow: 0 0 12px rgba(255, 209, 102, 0.6);
     }
 
     .pin-keypad {
@@ -676,22 +670,24 @@
       height: 62px;
       margin: 0 auto;
       border-radius: 50%;
-      border: 1.5px solid var(--pink-border);
-      background: #FFFFFF;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
       font-size: 22px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text-white);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 3px 8px rgba(255, 117, 143, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       transition: all 0.1s;
     }
     .pin-key:active {
-      background: var(--pink-light);
+      background: rgba(255, 209, 102, 0.25);
       transform: scale(0.92);
-      border-color: var(--pink-primary);
+      border-color: var(--lunar-gold);
+      color: var(--lunar-gold);
     }
     .pin-key.fn {
       font-size: 14px;
@@ -702,13 +698,13 @@
     }
 
     /* ===================================================
-       MODAL & POPUP DIALOGS (Bottom Sheets)
+       MODAL & POPUP DIALOGS (กระจกด้าน โปร่งใส)
        =================================================== */
     .modal-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(45, 30, 40, 0.45);
-      backdrop-filter: blur(3px);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -718,15 +714,17 @@
 
     .bottom-sheet {
       width: 100%;
-      background: #FFFFFF;
+      background: rgba(18, 20, 28, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top-left-radius: 24px;
       border-top-right-radius: 24px;
-      border-top: 2px solid var(--pink-border);
+      border-top: 1.5px solid var(--glass-border);
       padding: 18px 18px 24px 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      box-shadow: 0 -8px 28px rgba(255, 117, 143, 0.2);
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.7);
       animation: slideUp 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
     @keyframes slideUp {
@@ -740,12 +738,12 @@
       justify-content: space-between;
       font-size: 14.5px;
       font-weight: 700;
-      color: var(--pink-dark);
+      color: var(--lunar-gold);
     }
     .modal-close-btn {
       border: none;
-      background: #FFE8ED;
-      color: var(--pink-dark);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
       font-size: 14px;
       width: 28px;
       height: 28px;
@@ -768,15 +766,35 @@
       align-items: center;
       justify-content: center;
       padding: 10px 4px;
-      background: var(--pink-soft);
-      border: 1.5px solid var(--pink-border);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border-subtle);
       border-radius: 14px;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .cat-select-cell:active { transform: scale(0.94); background: var(--pink-light); }
+    .cat-select-cell:active { transform: scale(0.94); background: rgba(255, 209, 102, 0.15); border-color: var(--lunar-gold); }
     .cat-select-cell .icon { font-size: 26px; margin-bottom: 2px; }
-    .cat-select-cell .name { font-size: 11px; font-weight: 600; color: var(--text-main); }
+    .cat-select-cell .name { font-size: 11px; font-weight: 600; color: var(--text-white); }
+
+    /* Review Items in Confirmation Modal */
+    .confirm-review-list {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 2px;
+    }
+    .confirm-review-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
 
     /* Toast Notification */
     .toast-box {
@@ -784,8 +802,9 @@
       top: 14px;
       left: 50%;
       transform: translateX(-50%) translateY(-50px);
-      background: #2D3436;
-      color: #FFFFFF;
+      background: rgba(18, 20, 28, 0.95);
+      border: 1px solid var(--lunar-gold);
+      color: var(--text-white);
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 12px;
@@ -794,7 +813,7 @@
       align-items: center;
       gap: 6px;
       z-index: 1000;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
       opacity: 0;
       pointer-events: none;
@@ -808,7 +827,7 @@
 </head>
 <body>
 
-  <!-- Toast Message -->
+  <!-- Toast Notification -->
   <div id="toast" class="toast-box">
     <span id="toast-icon">✨</span>
     <span id="toast-text">แจ้งเตือน</span>
@@ -820,9 +839,9 @@
          PIN LOCK SCREEN (หน้ากด PIN ก่อนเข้าใช้งาน)
          ======================================================== -->
     <div id="screen-pin-lock" class="pin-lock-screen">
-      <img src="https://i.postimg.cc/Kc6BXB17/NB.png" alt="NB Logo" class="pin-app-logo">
-      <div class="pin-screen-title">ยินดีต้อนรับสู่ NB</div>
-      <div class="pin-screen-desc">กดรหัส PIN 4 หลัก เพื่อเข้าสู่ระบบของคุณ</div>
+      <img src="https://i.postimg.cc/xC1sKNwZ/Lunar.png" alt="Lunar Logo" class="pin-app-logo">
+      <div class="pin-screen-title">Lunar</div>
+      <div class="pin-screen-desc">สำหรับใช้บันทึกรายจ่าย</div>
 
       <!-- 4 PIN Dots -->
       <div class="pin-dots-row">
@@ -847,10 +866,7 @@
         <button type="button" class="pin-key" onclick="pressPin('0')">0</button>
         <button type="button" class="pin-key fn" onclick="backspacePin()">⌫</button>
       </div>
-      
-      <div style="font-size: 11px; color: var(--pink-dark); margin-top: 6px;">
-        💡 ค่าเริ่มต้น: บอส (1234) | คู่หู (5678)
-      </div>
+      <!-- เอารหัสเริ่มต้นออกเรียบร้อยแล้ว -->
     </div>
 
     <!-- ========================================================
@@ -858,8 +874,8 @@
          ======================================================== -->
     <header class="app-header">
       <div class="brand-box" onclick="switchView('record')">
-        <img src="https://i.postimg.cc/Kc6BXB17/NB.png" alt="NB" class="brand-logo-img">
-        <span class="brand-title">NB</span>
+        <img src="https://i.postimg.cc/xC1sKNwZ/Lunar.png" alt="Lunar" class="brand-logo-img">
+        <span class="brand-title">Lunar</span>
       </div>
 
       <!-- Header Debt Badge -->
@@ -883,22 +899,11 @@
       <!-- ================= VIEW 1: RECORD & BATCH ================= -->
       <section id="view-record" class="view-section active">
 
-        <!-- Card: ผู้จ่าย & วันที่/เวลา -->
-        <div class="card-white" style="padding: 10px 12px;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display:flex; justify-content:space-between;">
-            <span>ใครจ่าย? (แตะเลือก)</span>
-            <span id="payer-tag" style="color: var(--pink-dark); font-weight: 700;">👤 บอส จ่าย</span>
-          </div>
-
-          <div class="payer-toggle">
-            <button type="button" id="payer-btn-u1" class="payer-btn active" onclick="setPayer('user1')">
-              <span id="payer-u1-avatar">🧑‍🦱</span>
-              <span id="payer-u1-name">บอส</span>
-            </button>
-            <button type="button" id="payer-btn-u2" class="payer-btn" onclick="setPayer('user2')">
-              <span id="payer-u2-avatar">👩‍🦰</span>
-              <span id="payer-u2-name">คู่หู</span>
-            </button>
+        <!-- Card: ผู้บันทึก (ล็อกอินด้วยรหัสนั้นเป็นคนบันทึกอัตโนมัติ) & วันที่/เวลา -->
+        <div class="glass-card" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="recorder-status-bar">
+            <span>🌙 ผู้บันทึกรายการ</span>
+            <span id="recorder-display-name" style="font-weight:700;">🧑‍🦱 บอส</span>
           </div>
 
           <!-- Thai Date & Time Overlay -->
@@ -916,9 +921,9 @@
         </div>
 
         <!-- Card: กรอกข้อมูลรายการ -->
-        <div class="card-pink" style="display:flex; flex-direction:column; gap:8px;">
+        <div class="glass-card" style="display:flex; flex-direction:column; gap:8px;">
           
-          <!-- Category Picker Trigger Button (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ) -->
+          <!-- Category Picker Trigger Button -->
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">หมวดหมู่</div>
             <div class="cat-popup-trigger" onclick="openCategoryModal()">
@@ -930,7 +935,7 @@
             </div>
           </div>
 
-          <!-- Amount Input (เอาปุ่มแนะนำยอดออกแล้ว) -->
+          <!-- Amount Input -->
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">จำนวนเงิน (บาท)</div>
             <div class="amount-input-box">
@@ -939,12 +944,12 @@
             </div>
           </div>
 
-          <!-- Split Option (วิธีหาร) -->
+          <!-- Split Option (เอา 50:50 ออก) -->
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">วิธีหารเงิน</div>
             <div class="split-row">
               <button type="button" id="split-half" class="split-btn active" onclick="setSplitMode('half')">
-                <span>🤝</span> <span>คนละครึ่ง (50:50)</span>
+                <span>🤝</span> <span>คนละครึ่ง</span>
               </button>
               <button type="button" id="split-full" class="split-btn" onclick="setSplitMode('full')">
                 <span>🎁</span> <span>จ่ายให้ 100%</span>
@@ -955,7 +960,7 @@
           <!-- Note Input (ช่องพิมพ์หมายเหตุ) -->
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">หมายเหตุ / รายละเอียด</div>
-            <input type="text" id="in-note" class="note-input-ctrl" placeholder="พิมพ์โน้ต เช่น ข้าวกลางวัน, กาแฟ 2 แก้ว...">
+            <input type="text" id="in-note" class="note-input-ctrl" placeholder="พิมพ์โน้ต เช่น ข้าวกลางวัน, กาแฟ...">
           </div>
 
           <!-- Button: เพิ่มเข้ารายการ -->
@@ -968,17 +973,19 @@
         <div class="batch-card" id="batch-container">
           <div class="batch-head">
             <span>📦 รายการรอส่ง (<span id="batch-count">0</span> รายการ)</span>
-            <span id="batch-total-txt" style="color: var(--pink-dark); font-weight:700;">รวม ฿0</span>
+            <span id="batch-total-txt" style="color: var(--lunar-gold); font-weight:700;">รวม ฿0</span>
           </div>
 
-          <div class="batch-list" id="batch-list-box">
-            <div id="batch-empty-hint" style="text-align: center; color: #A098A8; font-size: 11.5px; padding: 6px 0;">
-              ยังไม่มีรายการ กด "เพิ่มเข้ารายการ" ด้านบน
-            </div>
+          <!-- Empty Notice -->
+          <div id="batch-empty-hint" style="text-align: center; color: var(--text-muted); font-size: 11.5px; padding: 8px 0;">
+            ยังไม่มีรายการในชุดนี้ กด "เพิ่มเข้ารายการ" ด้านบน
           </div>
 
-          <!-- Submit All (เมื่อกดแล้วเคลียร์ช่องออกเลย) -->
-          <button type="button" id="btn-submit-batch" class="btn-submit-all" onclick="submitBatch()" disabled>
+          <!-- Batch Items Container -->
+          <div class="batch-list" id="batch-list-box"></div>
+
+          <!-- Submit All Trigger (เปิดป๊อปอัพตรวจสอบก่อนบันทึก) -->
+          <button type="button" id="btn-submit-batch" class="btn-submit-all" onclick="openBatchConfirmModal()" disabled>
             <span>🚀</span> <span>บันทึกข้อมูลทั้งหมด</span>
           </button>
         </div>
@@ -1008,16 +1015,16 @@
 
         <!-- Paid Stats Comparison -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="card-white" style="text-align: center;">
+          <div class="glass-card" style="text-align: center;">
             <div style="font-size: 26px;" id="stat-u1-avatar">🧑‍🦱</div>
             <div style="font-size: 13px; font-weight:700;" id="stat-u1-name">บอส</div>
-            <div style="font-size: 16px; font-weight:700; color:var(--pink-dark); margin-top:2px;" id="stat-u1-amt">฿0</div>
+            <div style="font-size: 16px; font-weight:700; color:var(--lunar-gold); margin-top:2px;" id="stat-u1-amt">฿0</div>
             <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
           </div>
-          <div class="card-white" style="text-align: center;">
+          <div class="glass-card" style="text-align: center;">
             <div style="font-size: 26px;" id="stat-u2-avatar">👩‍🦰</div>
             <div style="font-size: 13px; font-weight:700;" id="stat-u2-name">คู่หู</div>
-            <div style="font-size: 16px; font-weight:700; color:var(--pink-dark); margin-top:2px;" id="stat-u2-amt">฿0</div>
+            <div style="font-size: 16px; font-weight:700; color:var(--lunar-gold); margin-top:2px;" id="stat-u2-amt">฿0</div>
             <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
           </div>
         </div>
@@ -1027,7 +1034,7 @@
           <span>💸</span> <span>เคลียร์หนี้ / ชำระเงินคืน</span>
         </button>
 
-        <div class="card-white" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted);">
+        <div class="glass-card" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted);">
           <span style="font-size: 22px;">💡</span>
           <div>เมื่อโอนเงินคืนกันแล้ว กดปุ่ม <b>"เคลียร์หนี้"</b> เพื่อบันทึกประวัติและปรับยอดหนี้กลับเป็น 0 ทันที</div>
         </div>
@@ -1037,8 +1044,8 @@
       <!-- ================= VIEW 3: HISTORY ================= -->
       <section id="view-history" class="view-section">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size: 14px; font-weight:700; color:var(--pink-dark);">📋 ประวัติรายการทั้งหมด</span>
-          <button type="button" onclick="confirmClearHistory()" style="background:transparent; border:none; font-size:11px; color:#A098A8; cursor:pointer;">
+          <span style="font-size: 14px; font-weight:700; color:var(--lunar-gold);">📋 ประวัติรายการทั้งหมด</span>
+          <button type="button" onclick="confirmClearHistory()" style="background:transparent; border:none; font-size:11px; color:var(--text-muted); cursor:pointer;">
             ล้างประวัติ
           </button>
         </div>
@@ -1048,17 +1055,17 @@
         </div>
       </section>
 
-      <!-- ================= VIEW 4: SETTINGS & GAS ================= -->
+      <!-- ================= VIEW 4: SETTINGS & SYNC ================= -->
       <section id="view-settings" class="view-section">
         
-        <!-- User Names & PINs Setup -->
-        <div class="card-white">
-          <div style="font-size: 13px; font-weight: 700; color: var(--pink-dark); margin-bottom: 8px;">
-            ⚙️ ข้อมูลผู้ใช้งาน & รหัส PIN
+        <!-- User Names & PINs Setup (ซิงค์ทุกเครื่องให้ใช้รหัสเดียวกัน) -->
+        <div class="glass-card">
+          <div style="font-size: 13px; font-weight: 700; color: var(--lunar-gold); margin-bottom: 8px;">
+            ⚙️ ข้อมูลผู้ใช้งาน & รหัส PIN (ซิงค์ทุกเครื่อง)
           </div>
 
           <!-- User 1 -->
-          <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--pink-border);">
+          <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--glass-border-subtle);">
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">ผู้ใช้งาน 1 (User 1)</div>
             <div style="display:flex; gap: 8px;">
               <input type="text" id="cfg-u1-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="🧑‍🦱">
@@ -1077,33 +1084,13 @@
             </div>
           </div>
 
-          <button type="button" class="btn-add-batch" onclick="saveUserSettings()" style="margin-top: 10px; padding: 8px;">
+          <button type="button" class="btn-add-batch" onclick="saveUserSettings()" style="margin-top: 12px; padding: 9px;">
             <span>💾</span> <span>บันทึกข้อมูลและรหัส PIN</span>
           </button>
         </div>
 
-        <!-- Google Sheet Integration -->
-        <div class="card-white">
-          <div style="font-size: 13px; font-weight: 700; color: #20BF6B; margin-bottom: 4px;">
-            📊 เชื่อมต่อ Google Sheets (Cloud Sync)
-          </div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-            ใส่ Google Apps Script Web App URL เพื่อบันทึกข้อมูลลง Google Sheet และแชร์ข้อมูลร่วมกัน 2 เครื่อง
-          </div>
-          <input type="url" id="cfg-gas-url" class="note-input-ctrl" placeholder="https://script.google.com/macros/s/.../exec">
-          
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button type="button" class="btn-add-batch" onclick="saveGasUrl()" style="background:#20BF6B; padding:8px; flex:1;">
-              <span>🔗</span> <span>บันทึก URL</span>
-            </button>
-            <button type="button" class="btn-add-batch" onclick="fetchFromGas()" style="background:#0984E3; padding:8px; flex:1;">
-              <span>🔄</span> <span>ดึงข้อมูลล่าสุด</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Logout / Relock -->
-        <button type="button" class="btn-add-batch" onclick="lockAppScreen()" style="background:#7A7585;">
+        <button type="button" class="btn-add-batch" onclick="lockAppScreen()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
           <span>🔒</span> <span>ล็อกหน้าจอ (กลับหน้า PIN)</span>
         </button>
 
@@ -1192,6 +1179,39 @@
     </div>
 
     <!-- ========================================================
+         MODAL: ตรวจสอบรายการก่อนบันทึกทั้งหมด (Requirement 4)
+         ======================================================== -->
+    <div id="modal-batch-confirm" class="modal-backdrop">
+      <div class="bottom-sheet">
+        <div class="modal-head">
+          <span>🔍 ตรวจสอบรายการก่อนบันทึก</span>
+          <button type="button" class="modal-close-btn" onclick="closeBatchConfirmModal()">✕</button>
+        </div>
+
+        <div style="font-size:12px; color:var(--text-muted);">
+          กรุณาตรวจสอบความถูกต้องของรายการทั้งหมดก่อนกดส่ง:
+        </div>
+
+        <!-- List of items to confirm -->
+        <div class="confirm-review-list" id="confirm-review-items"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(255,209,102,0.1); border-radius:12px; border:1px solid var(--lunar-gold);">
+          <span style="font-size:13px; font-weight:700;">ยอดรวมทั้งหมด:</span>
+          <span id="confirm-review-total" style="font-size:16px; font-weight:700; color:var(--lunar-gold);">฿0</span>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button type="button" class="btn-add-batch" onclick="closeBatchConfirmModal()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle); flex:1;">
+            ✕ ตรวจสอบอีกครั้ง
+          </button>
+          <button type="button" class="btn-submit-all" onclick="executeSubmitBatch()" style="flex:1.2;">
+            ✅ ยืนยันบันทึก
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
          MODAL: SETTLE CONFIRMATION
          ======================================================== -->
     <div id="modal-settle" class="modal-backdrop">
@@ -1203,8 +1223,8 @@
 
         <div style="text-align: center; margin: 4px 0;">
           <div style="font-size: 11.5px; color: var(--text-muted);">ยอดหนี้ที่ต้องชำระ</div>
-          <div id="modal-settle-amt" style="font-size: 28px; font-weight:700; color:var(--pink-dark); margin:2px 0;">฿0</div>
-          <div id="modal-settle-desc" style="font-size: 12px; color: var(--text-main);">ผู้โอน -> ผู้รับ</div>
+          <div id="modal-settle-amt" style="font-size: 28px; font-weight:700; color:var(--lunar-gold); margin:2px 0;">฿0</div>
+          <div id="modal-settle-desc" style="font-size: 12px; color: var(--text-white);">ผู้โอน -> ผู้รับ</div>
         </div>
 
         <div>
@@ -1227,21 +1247,23 @@
 
   <!-- ========================================================
        JAVASCRIPT LOGIC
-       ======================================================== -->
+       ======================================================== */
   <script>
-    const STORAGE_KEY_CFG = 'nb_app_config_v2';
-    const STORAGE_KEY_ITEMS = 'nb_app_items_v2';
+    const STORAGE_KEY_CFG = 'lunar_app_config_v3';
+    const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
+
+    // Google Sheets Backend API Endpoint
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbx_fdQJCcCIcdhzynjL97VFOxGL0s0kMBw3GNEJ4m_srWaX5EwhqZOQkEC5eePpmyCo/exec';
 
     // Default configuration
     let appConfig = {
       user1: { name: 'บอส', avatar: '🧑‍🦱', pin: '1234' },
       user2: { name: 'คู่หู', avatar: '👩‍🦰', pin: '5678' },
       activeUserKey: 'user1',
-      gasUrl: 'https://script.google.com/macros/s/AKfycbxFH-CTmTW0gnhpRCluVR57dY0PJjxS_7uCJkCViPf52wxcdhaIku1IbuFsgjw2nzlW/exec'
+      gasUrl: DEFAULT_GAS_URL
     };
 
     let enteredPin = '';
-    let currentPayerKey = 'user1';
     let currentCategory = { icon: '🍛', name: 'อาหาร' };
     let currentSplitMode = 'half';
     let batchQueue = [];
@@ -1254,10 +1276,8 @@
       renderBatch();
       renderAll();
 
-      // Check if GAS URL is already set, if so fetch from Google Sheets
-      if (appConfig.gasUrl) {
-        fetchFromGas(true);
-      }
+      // Fetch latest data and global config from Google Sheets
+      fetchFromGas(true);
 
       // Register Service Worker
       if ('serviceWorker' in navigator) {
@@ -1271,13 +1291,16 @@
     function loadLocalStorage() {
       try {
         const savedCfg = localStorage.getItem(STORAGE_KEY_CFG);
-        if (savedCfg) appConfig = Object.assign(appConfig, JSON.parse(savedCfg));
+        if (savedCfg) {
+          appConfig = Object.assign(appConfig, JSON.parse(savedCfg));
+        }
+        // Always ensure valid GAS URL
+        if (!appConfig.gasUrl) appConfig.gasUrl = DEFAULT_GAS_URL;
 
         const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
         if (savedItems) {
           transactions = JSON.parse(savedItems);
         } else {
-          // Initial demo item
           transactions = [
             {
               id: 'tx_' + Date.now(),
@@ -1367,7 +1390,6 @@
 
     function loginAsUser(userKey) {
       appConfig.activeUserKey = userKey;
-      currentPayerKey = userKey;
       saveConfig();
       applyConfigToUI();
 
@@ -1377,7 +1399,7 @@
       updatePinDots();
 
       const user = appConfig[userKey];
-      showToast(`🌸 ยินดีต้อนรับ คุณ${user.name}`, '👋');
+      showToast(`🌙 ยินดีต้อนรับ คุณ${user.name}`, '👋');
     }
 
     function lockAppScreen() {
@@ -1464,17 +1486,14 @@
     function applyConfigToUI() {
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
+      const active = appConfig[appConfig.activeUserKey];
 
       // Header User Pill
-      const active = appConfig[appConfig.activeUserKey];
       document.getElementById('hdr-user-avatar').textContent = active.avatar;
       document.getElementById('hdr-user-name').textContent = active.name;
 
-      // Payer toggle
-      document.getElementById('payer-u1-avatar').textContent = u1.avatar;
-      document.getElementById('payer-u1-name').textContent = u1.name;
-      document.getElementById('payer-u2-avatar').textContent = u2.avatar;
-      document.getElementById('payer-u2-name').textContent = u2.name;
+      // Recorder Status in Form (ล็อกอินคนไหน คนนั้นเป็นคนบันทึก)
+      document.getElementById('recorder-display-name').textContent = `${active.avatar} ${active.name}`;
 
       // Stats
       document.getElementById('stat-u1-avatar').textContent = u1.avatar;
@@ -1490,31 +1509,6 @@
       document.getElementById('cfg-u2-avatar').value = u2.avatar;
       document.getElementById('cfg-u2-name').value = u2.name;
       document.getElementById('cfg-u2-pin').value = u2.pin;
-
-      document.getElementById('cfg-gas-url').value = appConfig.gasUrl || '';
-
-      updatePayerUI();
-    }
-
-    function setPayer(key) {
-      currentPayerKey = key;
-      updatePayerUI();
-    }
-
-    function updatePayerUI() {
-      const u1Btn = document.getElementById('payer-btn-u1');
-      const u2Btn = document.getElementById('payer-btn-u2');
-      const tag = document.getElementById('payer-tag');
-      const active = appConfig[currentPayerKey];
-
-      if (currentPayerKey === 'user1') {
-        u1Btn.classList.add('active');
-        u2Btn.classList.remove('active');
-      } else {
-        u2Btn.classList.add('active');
-        u1Btn.classList.remove('active');
-      }
-      tag.textContent = `${active.avatar} ${active.name} จ่าย`;
     }
 
     /* ========================================================
@@ -1563,7 +1557,7 @@
         tempId: 'batch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         dateStr,
         timeStr,
-        payerKey: currentPayerKey,
+        payerKey: appConfig.activeUserKey, // คนล็อกอินเป็นคนบันทึก
         catIcon: currentCategory.icon,
         catName: currentCategory.name,
         amount,
@@ -1599,9 +1593,8 @@
 
       if (batchQueue.length === 0) {
         emptyHint.style.display = 'block';
+        listEl.innerHTML = '';
         submitBtn.disabled = true;
-        const oldItems = listEl.querySelectorAll('.batch-item');
-        oldItems.forEach(el => el.remove());
         return;
       }
 
@@ -1610,8 +1603,8 @@
 
       let html = '';
       batchQueue.forEach((it) => {
-        const payer = appConfig[it.payerKey];
-        const splitLabel = it.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
+        const payer = appConfig[it.payerKey] || { name: 'ผู้บันทึก', avatar: '👤' };
+        const splitLabel = it.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
         html += `
           <div class="batch-item">
             <div class="batch-item-left">
@@ -1631,8 +1624,44 @@
       listEl.innerHTML = html;
     }
 
-    /* เมื่อบันทึกข้อมูลแล้ว ให้เคลียร์ช่องรายการออกเลย */
-    function submitBatch() {
+    /* ========================================================
+       CONFIRMATION POPUP BEFORE SUBMIT (Requirement 4)
+       ======================================================== */
+    function openBatchConfirmModal() {
+      if (batchQueue.length === 0) return;
+
+      const container = document.getElementById('confirm-review-items');
+      const totalEl = document.getElementById('confirm-review-total');
+      const total = batchQueue.reduce((sum, item) => sum + item.amount, 0);
+      totalEl.textContent = `฿${total.toLocaleString('th-TH')}`;
+
+      let html = '';
+      batchQueue.forEach((it, idx) => {
+        const splitText = it.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
+        html += `
+          <div class="confirm-review-row">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">${it.catIcon}</span>
+              <div>
+                <div style="font-weight:700; color:#FFF;">${escapeHtml(it.note)}</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">${splitText}</div>
+              </div>
+            </div>
+            <div style="font-weight:700; color:var(--lunar-gold);">฿${it.amount.toLocaleString()}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+      document.getElementById('modal-batch-confirm').classList.add('active');
+    }
+
+    function closeBatchConfirmModal() {
+      document.getElementById('modal-batch-confirm').classList.remove('active');
+    }
+
+    /* ยืนยันบันทึกข้อมูลทั้งหมด (Requirement 3 & 4) */
+    function executeSubmitBatch() {
       if (batchQueue.length === 0) return;
 
       const now = Date.now();
@@ -1656,7 +1685,7 @@
 
       const count = batchQueue.length;
 
-      // เคลียร์ตะกร้าและช่องกรอกทั้งหมด
+      // เคลียร์ตะกร้าและช่องกรอกทั้งหมดอย่างสมบูรณ์ 100%
       batchQueue = [];
       document.getElementById('in-amount').value = '';
       document.getElementById('in-note').value = '';
@@ -1664,6 +1693,7 @@
 
       renderBatch();
       renderAll();
+      closeBatchConfirmModal();
 
       showToast(`🎉 บันทึกสำเร็จ ${count} รายการ!`, '🚀');
 
@@ -1718,25 +1748,16 @@
 
       if (rounded <= 0.01) {
         hdrBadge.textContent = '⚖️ เสมอกัน ฿0';
-        hdrBadge.style.background = '#FFE5EC';
-        hdrBadge.style.color = '#E05370';
-
         heroAmt.textContent = '฿0';
         heroDesc.textContent = 'เคลียร์ครบแล้ว ไม่มีใครติดค้าง 🎉';
       } else if (netDebt > 0) {
         // u2 owes u1
         hdrBadge.textContent = `${u2.avatar} โอนให้ ${u1.avatar} ฿${rounded.toLocaleString()}`;
-        hdrBadge.style.background = '#FFE5EC';
-        hdrBadge.style.color = '#E05370';
-
         heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u2.avatar} ${u2.name} ต้องโอนให้ ${u1.avatar} ${u1.name}`;
       } else {
         // u1 owes u2
         hdrBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${rounded.toLocaleString()}`;
-        hdrBadge.style.background = '#FFE5EC';
-        hdrBadge.style.color = '#E05370';
-
         heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u1.avatar} ${u1.name} ต้องโอนให้ ${u2.avatar} ${u2.name}`;
       }
@@ -1748,11 +1769,11 @@
     /* รายการล่าสุด พร้อมไอคอนลบ */
     function renderRecentList() {
       const container = document.getElementById('recent-list-container');
-      const recent = transactions.slice(0, 4); // 4 รายการล่าสุด
+      const recent = transactions.slice(0, 4);
 
       if (recent.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; color: #A098A8; font-size: 11px; padding: 8px 0;">
+          <div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 8px 0;">
             ยังไม่มีรายการ
           </div>
         `;
@@ -1765,23 +1786,23 @@
           const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
           const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
           html += `
-            <div class="recent-row" style="background:#F0FDF4;">
+            <div class="recent-row" style="background:rgba(6,214,160,0.08); border-color:rgba(6,214,160,0.25);">
               <div class="recent-left">
                 <span class="recent-icon">🤝</span>
                 <div>
-                  <div class="recent-note" style="color:#16A34A;">เคลียร์หนี้เรียบร้อย</div>
+                  <div class="recent-note" style="color:var(--accent-mint);">เคลียร์หนี้เรียบร้อย</div>
                   <div class="recent-sub">${tx.dateStr} • ${settler.name} โอนให้ ${receiver.name}</div>
                 </div>
               </div>
               <div class="recent-right">
-                <span class="recent-amt" style="color:#16A34A;">฿${tx.amount.toLocaleString()}</span>
+                <span class="recent-amt" style="color:var(--accent-mint);">฿${tx.amount.toLocaleString()}</span>
                 <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')" title="ลบรายการ">🗑️</button>
               </div>
             </div>
           `;
         } else {
           const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
-          const splitLabel = tx.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
+          const splitLabel = tx.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
           html += `
             <div class="recent-row">
               <div class="recent-left">
@@ -1806,7 +1827,7 @@
       const container = document.getElementById('full-history-container');
       if (transactions.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; color: #A098A8; font-size: 12px; padding: 25px 0;">
+          <div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 25px 0;">
             ยังไม่มีประวัติการทำรายการ
           </div>
         `;
@@ -1819,23 +1840,23 @@
           const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
           const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
           html += `
-            <div class="recent-row" style="background:#F0FDF4; padding:8px 12px;">
+            <div class="recent-row" style="background:rgba(6,214,160,0.08); padding:8px 12px; border-color:rgba(6,214,160,0.25);">
               <div class="recent-left">
                 <span class="recent-icon">🤝</span>
                 <div>
-                  <div class="recent-note" style="color:#16A34A;">เคลียร์หนี้เรียบร้อย</div>
+                  <div class="recent-note" style="color:var(--accent-mint);">เคลียร์หนี้เรียบร้อย</div>
                   <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${settler.name} โอนให้ ${receiver.name}</div>
                 </div>
               </div>
               <div class="recent-right">
-                <span class="recent-amt" style="color:#16A34A;">฿${tx.amount.toLocaleString()}</span>
+                <span class="recent-amt" style="color:var(--accent-mint);">฿${tx.amount.toLocaleString()}</span>
                 <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')">🗑️</button>
               </div>
             </div>
           `;
         } else {
           const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
-          const splitLabel = tx.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
+          const splitLabel = tx.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
           html += `
             <div class="recent-row" style="padding:8px 12px;">
               <div class="recent-left">
@@ -1865,7 +1886,6 @@
       renderAll();
       showToast('ลบรายการเรียบร้อย', '🗑️');
 
-      // Delete on Google Sheets if configured
       if (appConfig.gasUrl) {
         deleteOnGas(id);
       }
@@ -1949,22 +1969,22 @@
     /* ========================================================
        GOOGLE SHEETS / GOOGLE APPS SCRIPT SYNC
        ======================================================== */
-    function saveGasUrl() {
-      const url = document.getElementById('cfg-gas-url').value.trim();
-      appConfig.gasUrl = url;
-      saveConfig();
-      showToast('บันทึก Google Sheets URL แล้ว', '📊');
-      if (url) fetchFromGas();
-    }
-
     function fetchFromGas(silent = false) {
       if (!appConfig.gasUrl) return;
-      if (!silent) showToast('กำลังซิงค์ข้อมูลจาก Google Sheets...', '🔄');
 
       fetch(appConfig.gasUrl + '?action=getAll')
         .then(res => res.json())
         .then(data => {
           if (data && data.status === 'success') {
+            // ซิงค์ชื่อและรหัสผู้ใช้งานให้เหมือนกันทุกเครื่อง (Requirement 6)
+            if (data.config && typeof data.config === 'object') {
+              if (data.config.user1) appConfig.user1 = data.config.user1;
+              if (data.config.user2) appConfig.user2 = data.config.user2;
+              saveConfig();
+              applyConfigToUI();
+            }
+
+            // ซิงค์รายการธุรกรรม
             if (Array.isArray(data.transactions) && data.transactions.length > 0) {
               transactions = data.transactions;
               saveTransactions();
@@ -1975,7 +1995,7 @@
         })
         .catch(err => {
           console.error(err);
-          if (!silent) showToast('เชื่อมต่อล้มเหลว ตรวจสอบ URL', '⚠️');
+          if (!silent) showToast('เชื่อมต่อล้มเหลว ตรวจสอบเครือข่าย', '⚠️');
         });
     }
 
@@ -2006,9 +2026,7 @@
       }).catch(e => console.error('GAS settle err:', e));
     }
 
-    /* ========================================================
-       SETTINGS & UTILITIES
-       ======================================================== */
+    /* ซิงค์การตั้งค่ารหัสและชื่อผู้ใช้ไปยัง Google Sheets เพื่อให้ทุกเครื่องใช้รหัสเดียวกัน (Requirement 6) */
     function saveUserSettings() {
       const u1Name = document.getElementById('cfg-u1-name').value.trim() || 'บอส';
       const u1Avatar = document.getElementById('cfg-u1-avatar').value.trim() || '🧑‍🦱';
@@ -2023,7 +2041,23 @@
       saveConfig();
       applyConfigToUI();
       renderAll();
-      showToast('บันทึกการตั้งค่าเรียบร้อย!', '💾');
+
+      // บันทึกลง Google Sheets
+      if (appConfig.gasUrl) {
+        fetch(appConfig.gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'saveConfig',
+            config: {
+              user1: appConfig.user1,
+              user2: appConfig.user2
+            }
+          })
+        }).catch(err => console.error('saveConfig err:', err));
+      }
+
+      showToast('บันทึกและซิงค์รหัส PIN ไปยังทุกเครื่องแล้ว! 🌙', '💾');
     }
 
     function confirmClearHistory() {

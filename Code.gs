@@ -1,5 +1,5 @@
 /**
- * NB DuoPay Backend - Google Apps Script (Code.gs)
+ * Lunar (NB) Backend - Google Apps Script (Code.gs)
  * เชื่อมต่อ Google Sheets สำหรับบันทึกรายจ่าย 2 คนและเคลียร์หนี้
  */
 
@@ -34,8 +34,8 @@ function initSheets(ss) {
     txSheet.appendRow(headers);
     txSheet.getRange("A1:L1")
       .setFontWeight("bold")
-      .setBackground("#FFCCD5")
-      .setFontColor("#C92A2A")
+      .setBackground("#FFD166")
+      .setFontColor("#0B0C10")
       .setHorizontalAlignment("center");
     txSheet.setFrozenRows(1);
   }
@@ -44,16 +44,13 @@ function initSheets(ss) {
   if (!cfgSheet) {
     cfgSheet = ss.insertSheet(SHEET_CFG_NAME);
     cfgSheet.appendRow(["Key", "Value"]);
-    cfgSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#FFE3E8");
+    cfgSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#FFEAA7");
   }
 
   Logger.log("✅ สร้าง/ตรวจสอบ Sheet เรียบร้อยแล้ว: " + ss.getName());
   return "OK";
 }
 
-/**
- * ฟังก์ชันทดสอบการเชื่อมต่อ
- */
 function testConnection() {
   return initSheets();
 }
@@ -77,14 +74,14 @@ function doGet(e) {
       });
     }
 
-    return createJsonResponse({ status: "ok", message: "NB Backend is running" });
+    return createJsonResponse({ status: "ok", message: "Lunar Backend is running" });
   } catch (err) {
     return createJsonResponse({ status: "error", message: err.toString() });
   }
 }
 
 /**
- * จัดการคำขอ HTTP POST (บันทึก / ลบ / เคลียร์หนี้)
+ * จัดการคำขอ HTTP POST (บันทึก / ลบ / เคลียร์หนี้ / ตั้งค่าผู้ใช้)
  */
 function doPost(e) {
   try {
@@ -200,9 +197,18 @@ function getConfigData(ss) {
   const cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
   if (!cfgSheet) return null;
   const rows = cfgSheet.getDataRange().getValues();
+  if (rows.length <= 1) return null;
   const cfg = {};
   for (let i = 1; i < rows.length; i++) {
-    if (rows[i][0]) cfg[rows[i][0]] = rows[i][1];
+    const k = rows[i][0];
+    const val = rows[i][1];
+    if (k) {
+      try {
+        cfg[k] = JSON.parse(val);
+      } catch (e) {
+        cfg[k] = val;
+      }
+    }
   }
   return cfg;
 }
@@ -213,7 +219,9 @@ function saveConfigData(ss, cfg) {
   cfgSheet.clear();
   cfgSheet.appendRow(["Key", "Value"]);
   for (let k in cfg) {
-    cfgSheet.appendRow([k, typeof cfg[k] === "object" ? JSON.stringify(cfg[k]) : cfg[k]]);
+    if (cfg.hasOwnProperty(k)) {
+      cfgSheet.appendRow([k, typeof cfg[k] === "object" ? JSON.stringify(cfg[k]) : cfg[k]]);
+    }
   }
 }
 
