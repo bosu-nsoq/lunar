@@ -123,8 +123,8 @@
       background: rgba(11, 12, 16, 0.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      padding-top: max(22px, calc(env(safe-area-inset-top, 0px) + 14px));
-      padding-bottom: 12px;
+      padding-top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px));
+      padding-bottom: 10px;
       padding-left: max(16px, env(safe-area-inset-left, 16px));
       padding-right: max(16px, env(safe-area-inset-right, 16px));
       display: flex;
@@ -196,8 +196,8 @@
       flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px 14px calc(76px + env(safe-area-inset-bottom, 0px)) 14px;
-      gap: 12px;
+      padding: 10px 12px 14px 12px;
+      gap: 9px;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
@@ -206,19 +206,11 @@
     .view-section {
       display: none;
       flex-direction: column;
-      gap: 12px;
+      gap: 9px;
       animation: fadeIn 0.2s ease-out;
       width: 100%;
     }
     .view-section.active { display: flex; }
-
-    /* จัดหน้าตาบนมือถือ (แนวตั้ง) ให้อยู่กลางจออย่างสวยงามเมื่อหน้าจอสูง */
-    @media (min-height: 680px) {
-      #view-record, #view-balance {
-        justify-content: center;
-        min-height: calc(100% - 10px);
-      }
-    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
@@ -583,23 +575,21 @@
     .balance-amount { font-size: 32px; font-weight: 700; color: var(--lunar-gold); margin: 3px 0; }
     .balance-desc { font-size: 13px; font-weight: 600; }
 
-    /* Bottom Navigation Bar */
+    /* Bottom Navigation Bar (แสดงครบถ้วน 100% ล็อกที่ขอบล่างของหน้าจอ) */
     .app-nav {
-      position: absolute;
-      bottom: 0;
-      left: 0;
+      flex-shrink: 0;
       width: 100%;
-      height: calc(62px + env(safe-area-inset-bottom, 0px));
+      height: calc(56px + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: rgba(11, 12, 16, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(11, 12, 16, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--glass-border);
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding-left: 4px;
-      padding-right: 4px;
+      padding-left: 6px;
+      padding-right: 6px;
       z-index: 20;
     }
     .nav-item {
@@ -928,13 +918,8 @@
       <!-- ================= VIEW 1: RECORD & BATCH ================= -->
       <section id="view-record" class="view-section active">
 
-        <!-- Card: ผู้บันทึก (ล็อกอินด้วยรหัสนั้นเป็นคนบันทึกอัตโนมัติ) & วันที่/เวลา -->
-        <div class="glass-card" style="display:flex; flex-direction:column; gap:8px;">
-          <div class="recorder-status-bar">
-            <span>🌙 ผู้บันทึกรายการ</span>
-            <span id="recorder-display-name" style="font-weight:700;">🧑‍🦱 บอส</span>
-          </div>
-
+        <!-- Card: วันที่/เวลา ทำรายการ -->
+        <div class="glass-card" style="padding: 8px 12px;">
           <!-- Thai Date & Time Overlay -->
           <div class="datetime-bar">
             <div class="dt-wrap" title="คลิกเพื่อเลือกวันที่">
@@ -973,15 +958,15 @@
             </div>
           </div>
 
-          <!-- Split Option (เอา 50:50 ออก) -->
+          <!-- Split Option (สลับปุ่ม: จ่ายเต็ม อันดับแรก, จ่ายคนละครึ่ง อันดับสอง) -->
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">วิธีหารเงิน</div>
             <div class="split-row">
-              <button type="button" id="split-half" class="split-btn active" onclick="setSplitMode('half')">
-                <span>🤝</span> <span>จ่ายคนละครึ่ง</span>
-              </button>
-              <button type="button" id="split-full" class="split-btn" onclick="setSplitMode('full')">
+              <button type="button" id="split-full" class="split-btn active" onclick="setSplitMode('full')">
                 <span>🎁</span> <span>จ่ายเต็ม</span>
+              </button>
+              <button type="button" id="split-half" class="split-btn" onclick="setSplitMode('half')">
+                <span>🤝</span> <span>จ่ายคนละครึ่ง</span>
               </button>
             </div>
           </div>
@@ -1047,14 +1032,19 @@
           </div>
         </div>
 
-        <!-- Button: เคลียร์หนี้ -->
-        <button type="button" class="btn-add-batch" onclick="openSettleModal()" style="padding: 13px; font-size: 15px;">
-          <span>💸</span> <span>เคลียร์หนี้</span>
-        </button>
+        <!-- Action Buttons: เคลียร์หนี้ & ทวงหนี้ (Item 3) -->
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-add-batch" onclick="openSettleModal()" style="flex:1; padding: 12px; font-size: 14px;">
+            <span>💸</span> <span>เคลียร์หนี้</span>
+          </button>
+          <button type="button" class="btn-add-batch" onclick="triggerNudgeDebt()" style="flex:1; padding: 12px; font-size: 14px; background: rgba(255, 107, 107, 0.16); border: 1px solid rgba(255, 107, 107, 0.45); color: #FF8787;">
+            <span>🔔</span> <span>ทวงหนี้</span>
+          </button>
+        </div>
 
-        <div class="glass-card" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted);">
-          <span style="font-size: 22px;">💡</span>
-          <div>เมื่อโอนเงินคืนกันแล้ว กดปุ่ม <b>"เคลียร์หนี้"</b> เพื่อบันทึกประวัติและปรับยอดหนี้กลับเป็น 0 ทันที</div>
+        <div class="glass-card" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted); padding: 10px 12px;">
+          <span style="font-size: 20px;">💡</span>
+          <div>กดปุ่ม <b>"ทวงหนี้"</b> เพื่อส่งการแจ้งเตือนสะกิดเตือนแฟนเข้า LINE หรือกด <b>"เคลียร์หนี้"</b> เมื่อโอนเงินแล้ว</div>
         </div>
 
       </section>
@@ -1281,7 +1271,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyG6juipvPndH0qMicgUjnbo8AjEGY4K2uNCKAdPrfVY_HFuHuoNm-Bfh2UX43h0Mbk/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycby6j6R53AaDoJWZd6_RCcDiTa1mNuWRl0a4JfENE3s0FiKgZ2jC6wWk4QnAr7tSWh73/exec';
 
     // Default configuration
     let appConfig = {
@@ -1293,7 +1283,7 @@
 
     let enteredPin = '';
     let currentCategory = { icon: '🍛', name: 'อาหาร' };
-    let currentSplitMode = 'half';
+    let currentSplitMode = 'full';
     let batchQueue = [];
     let transactions = [];
 
@@ -1520,8 +1510,9 @@
       document.getElementById('hdr-user-avatar').textContent = active.avatar;
       document.getElementById('hdr-user-name').textContent = active.name;
 
-      // Recorder Status in Form (ล็อกอินคนไหน คนนั้นเป็นคนบันทึก)
-      document.getElementById('recorder-display-name').textContent = `${active.avatar} ${active.name}`;
+      // Recorder Status in Form (หากมี)
+      const recEl = document.getElementById('recorder-display-name');
+      if (recEl) recEl.textContent = `${active.avatar} ${active.name}`;
 
       // Stats
       document.getElementById('stat-u1-avatar').textContent = u1.avatar;
@@ -1559,8 +1550,8 @@
 
     function setSplitMode(mode) {
       currentSplitMode = mode;
-      document.getElementById('split-half').classList.toggle('active', mode === 'half');
       document.getElementById('split-full').classList.toggle('active', mode === 'full');
+      document.getElementById('split-half').classList.toggle('active', mode === 'half');
     }
 
     /* ========================================================
@@ -1761,6 +1752,7 @@
       document.getElementById('in-amount').value = '';
       document.getElementById('in-note').value = '';
       chooseCategory('🍛', 'อาหาร');
+      setSplitMode('full');
 
       renderBatch();
       renderAll();
@@ -2036,6 +2028,48 @@
       if (appConfig.gasUrl) {
         sendSettleToGas(settleTx);
       }
+    }
+
+    /* ========================================================
+       NUDGE DEBT / ทวงหนี้ (Item 3)
+       ======================================================== */
+    function triggerNudgeDebt() {
+      const { netDebt } = calculateDebt();
+      const rounded = Math.round(Math.abs(netDebt) * 100) / 100;
+
+      if (rounded <= 0.01) {
+        showToast('ยอดเคลียร์ครบแล้ว ไม่มีใครติดค้างจ้า! 🎉', '✨');
+        return;
+      }
+
+      const u1 = appConfig.user1;
+      const u2 = appConfig.user2;
+      const debtor = netDebt > 0 ? u2 : u1;
+      const creditor = netDebt > 0 ? u1 : u2;
+
+      let msg = "📢 Lunar — สะกิดเตือนเคลียร์หนี้ 🌙\n\n";
+      msg += "ถึงคุณ " + debtor.avatar + " " + debtor.name + ":\n";
+      msg += "💸 มียอดค้างชำระอยู่ ฿" + rounded.toLocaleString() + " บาท\n";
+      msg += "📥 โอนให้ " + creditor.avatar + " " + creditor.name + " แล้วอย่าลืมกดเคลียร์หนี้ในแอปนะจ๊ะ ✨\n";
+      msg += "📅 วันที่: " + getTodayThaiDate();
+
+      // ส่ง Notification เข้า LINE ผ่าน Google Apps Script backend (ทั้ง Broadcast หาเพื่อนทุกคน และ Push เข้ากลุ่ม)
+      if (appConfig.gasUrl) {
+        fetch(appConfig.gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'nudgeDebt',
+            message: msg
+          })
+        }).catch(err => console.log('Nudge GAS error:', err));
+      }
+
+      showToast('🔔 ส่งการแจ้งเตือนทวงหนี้เรียบร้อย!', '📢');
+
+      // เปิดแอป LINE 1-Tap ส่งให้เพื่อนได้ทันที
+      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
+      window.open(lineUrl, '_blank');
     }
 
     /* ========================================================

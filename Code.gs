@@ -202,6 +202,12 @@ function doPost(e) {
       return createJsonResponse({ status: "success", message: "Settled recorded" });
     }
 
+    if (action === "nudgeDebt") {
+      const msg = postData.message || "🔔 Lunar: สะกิดเตือนเคลียร์หนี้จ้า!";
+      sendLinePush(msg, ss);
+      return createJsonResponse({ status: "success", message: "Nudge sent" });
+    }
+
     if (action === "saveConfig") {
       const cfg = postData.config;
       saveConfigData(ss, cfg);
@@ -309,26 +315,46 @@ function getLineTargetId(ss) {
 function testLineSendDirect(ss) {
   try {
     const token = getLineToken(ss);
-    const targetId = getLineTargetId(ss);
-    if (!token || !targetId) {
-      return { status: "missing_token_or_target", token: !!token, targetId: !!targetId };
+    if (!token) {
+      return { status: "missing_token" };
     }
-    const response = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+    
+    // ทดสอบส่ง Broadcast ถึงเพื่อนทุกคน (ไม่ต้องสร้างกลุ่ม)
+    const broadcastRes = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/broadcast", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token
       },
       payload: JSON.stringify({
-        to: targetId,
-        messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนสำเร็จ! ✨" }]
+        messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนถึงเพื่อนทุกคนสำเร็จ! (ไม่ต้องสร้างกลุ่ม) ✨" }]
       }),
       muteHttpExceptions: true
     });
+
+    const targetId = getLineTargetId(ss);
+    let pushCode = null;
+    if (targetId) {
+      const pushRes = UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        payload: JSON.stringify({
+          to: targetId,
+          messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนเข้ากลุ่มสำเร็จ! ✨" }]
+        }),
+        muteHttpExceptions: true
+      });
+      pushCode = pushRes.getResponseCode();
+    }
+
     return {
       status: "success",
-      httpCode: response.getResponseCode(),
-      responseBody: response.getContentText()
+      broadcastHttpCode: broadcastRes.getResponseCode(),
+      broadcastBody: broadcastRes.getContentText(),
+      pushHttpCode: pushCode
     };
   } catch (err) {
     return { status: "error", error: err.toString() };
@@ -336,40 +362,55 @@ function testLineSendDirect(ss) {
 }
 
 /**
- * ระบบส่งการแจ้งเตือนผ่าน LINE Push Message
+ * ระบบส่งการแจ้งเตือนผ่าน LINE
+ * 1. Broadcast ส่งหาทุกคนที่เป็นเพื่อนกับบอท (ไม่ต้องสร้างกลุ่ม)
+ * 2. Push ส่งเข้ากลุ่มหากมีการดึงบอทเข้ากลุ่ม
  */
 function sendLinePush(messageText, ss) {
   const token = getLineToken(ss);
-  const targetId = getLineTargetId(ss);
-
-  if (!token || !targetId) {
-    Logger.log("LINE Info: ยังไม่มี token หรือ targetId");
+  if (!token) {
+    Logger.log("LINE Info: ยังไม่มี token");
     return;
   }
 
-  const url = "https://api.line.me/v2/bot/message/push";
-  const payload = {
-    to: targetId,
-    messages: [
-      {
-        type: "text",
-        text: messageText
-      }
-    ]
-  };
-
+  // 1. Broadcast ส่งหาเพื่อนทุกคนของบอททันที (ไม่ต้องตั้งกลุ่ม)
   try {
-    UrlFetchApp.fetch(url, {
+    UrlFetchApp.fetch("https://api.line.me/v2/bot/message/broadcast", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token
       },
-      payload: JSON.stringify(payload),
+      payload: JSON.stringify({
+        messages: [{ type: "text", text: messageText }]
+      }),
       muteHttpExceptions: true
     });
+    Logger.log("LINE Broadcast สำเร็จ");
   } catch (err) {
-    Logger.log("LINE Notification Error: " + err.toString());
+    Logger.log("LINE Broadcast Error: " + err.toString());
+  }
+
+  // 2. ถ้ามีกลุ่ม ก็ส่งเข้ากลุ่มด้วย
+  const targetId = getLineTargetId(ss);
+  if (targetId) {
+    try {
+      UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        payload: JSON.stringify({
+          to: targetId,
+          messages: [{ type: "text", text: messageText }]
+        }),
+        muteHttpExceptions: true
+      });
+      Logger.log("LINE Push สำเร็จ: " + targetId);
+    } catch (err) {
+      Logger.log("LINE Notification Error: " + err.toString());
+    }
   }
 }
 
