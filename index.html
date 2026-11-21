@@ -67,12 +67,11 @@
     /* ล็อกการเลื่อนของหน้าจอทั้งหมด (100dvh Fixed Viewport) */
     html, body {
       width: 100%;
-      height: 100vh;
+      height: 100%;
       height: 100dvh;
       overflow: hidden;
-      position: fixed;
-      top: 0;
-      left: 0;
+      margin: 0;
+      padding: 0;
       background: #0B0C10;
       background-image: 
         radial-gradient(circle at 85% 15%, rgba(255, 209, 102, 0.14) 0%, transparent 45%),
@@ -87,14 +86,25 @@
 
     .app-viewport {
       width: 100%;
-      max-width: 480px;
+      max-width: 440px;
       height: 100%;
-      max-height: 100dvh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
       background: transparent;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 480px) {
+      html, body {
+        align-items: stretch;
+      }
+      .app-viewport {
+        height: 100dvh;
+        max-height: 100dvh;
+      }
     }
 
     /* Glassmorphism Card Style (กระจกด้าน โปร่งใส) */
@@ -108,12 +118,15 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     }
 
-    /* Header Bar */
+    /* Header Bar (ปรับระยะห่างด้านบนให้พ้น Notch, Dynamic Island, Punch-hole และ Status bar ทุกรุ่นอย่างสมบูรณ์) */
     .app-header {
-      background: rgba(11, 12, 16, 0.8);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      padding: 10px 14px;
+      background: rgba(11, 12, 16, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding-top: max(22px, calc(env(safe-area-inset-top, 0px) + 14px));
+      padding-bottom: 12px;
+      padding-left: max(16px, env(safe-area-inset-left, 16px));
+      padding-right: max(16px, env(safe-area-inset-right, 16px));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -183,8 +196,8 @@
       flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 10px 12px 76px 12px;
-      gap: 10px;
+      padding: 12px 14px calc(76px + env(safe-area-inset-bottom, 0px)) 14px;
+      gap: 12px;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
@@ -193,10 +206,19 @@
     .view-section {
       display: none;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       animation: fadeIn 0.2s ease-out;
+      width: 100%;
     }
     .view-section.active { display: flex; }
+
+    /* จัดหน้าตาบนมือถือ (แนวตั้ง) ให้อยู่กลางจออย่างสวยงามเมื่อหน้าจอสูง */
+    @media (min-height: 680px) {
+      #view-record, #view-balance {
+        justify-content: center;
+        min-height: calc(100% - 10px);
+      }
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
@@ -567,7 +589,8 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 62px;
+      height: calc(62px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       background: rgba(11, 12, 16, 0.88);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -575,7 +598,8 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 0 4px;
+      padding-left: 4px;
+      padding-right: 4px;
       z-index: 20;
     }
     .nav-item {
@@ -605,23 +629,28 @@
       inset: 0;
       background: #0B0C10;
       background-image: 
-        radial-gradient(circle at 50% 30%, rgba(255, 209, 102, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 50% 25%, rgba(255, 209, 102, 0.20) 0%, transparent 60%),
         linear-gradient(180deg, #0B0C10 0%, #12141C 100%);
       z-index: 999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 20px;
-      gap: 14px;
+      padding-top: max(32px, calc(env(safe-area-inset-top, 0px) + 20px));
+      padding-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 20px));
+      padding-left: 20px;
+      padding-right: 20px;
+      gap: 12px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       animation: fadeIn 0.25s ease-out;
     }
     .pin-lock-screen.hidden { display: none; }
 
     .pin-app-logo {
-      width: 76px;
-      height: 76px;
-      border-radius: 22px;
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
       box-shadow: 0 0 25px rgba(255, 209, 102, 0.4);
       margin-bottom: 2px;
     }
@@ -1197,6 +1226,11 @@
             ✅ ยืนยันบันทึก
           </button>
         </div>
+
+        <!-- ปุ่มทางเลือก: แชร์เข้า LINE ได้ทันที 100% -->
+        <button type="button" class="btn-add-batch" onclick="shareBatchToLineApp()" style="background:#06C755; color:#FFF; padding:10px; font-size:13px; margin-top:4px; box-shadow:0 4px 14px rgba(6,199,85,0.3);">
+          <span>💬</span> <span>แชร์สรุปรายการนี้เข้า LINE ทันที</span>
+        </button>
       </div>
     </div>
 
@@ -1229,6 +1263,11 @@
         <button type="button" class="btn-submit-all" onclick="confirmSettle()" style="margin-top: 6px;">
           <span>✅</span> <span>ยืนยันเคลียร์หนี้เรียบร้อย</span>
         </button>
+
+        <!-- ปุ่มทางเลือก: แชร์สลิป/หลักฐานเคลียร์หนี้เข้า LINE ทันที -->
+        <button type="button" class="btn-add-batch" onclick="shareSettleToLineApp()" style="background:#06C755; color:#FFF; padding:10px; font-size:13px; margin-top:4px; box-shadow:0 4px 14px rgba(6,199,85,0.3);">
+          <span>💬</span> <span>แชร์สลิป/หลักฐานเคลียร์หนี้เข้า LINE ทันที</span>
+        </button>
       </div>
     </div>
 
@@ -1242,7 +1281,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzbeXQBdCT41PJdj-P8j2eWFbsWWvck97d2WF9zyCscS1Q1jTUWf6qmAnsT7tkJeyUa/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyG6juipvPndH0qMicgUjnbo8AjEGY4K2uNCKAdPrfVY_HFuHuoNm-Bfh2UX43h0Mbk/exec';
 
     // Default configuration
     let appConfig = {
@@ -1643,6 +1682,49 @@
       container.innerHTML = html;
 
       document.getElementById('modal-batch-confirm').classList.add('active');
+    }
+
+    function shareBatchToLineApp() {
+      if (batchQueue.length === 0) return;
+      const active = appConfig[appConfig.activeUserKey];
+      const dateStr = document.getElementById('date-display').value || getTodayThaiDate();
+      const timeStr = document.getElementById('time-input').value || '12:00';
+
+      let msg = "🌙 Lunar — บันทึกรายจ่ายใหม่!\n";
+      msg += "👤 ผู้บันทึก: " + (active.avatar || "🧑‍🦱") + " " + active.name + "\n";
+      msg += "📅 วันที่: " + dateStr + " " + timeStr + "\n\n";
+
+      let total = 0;
+      batchQueue.forEach(it => {
+        const splitText = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
+        msg += "• " + it.catIcon + " " + it.note + " : ฿" + it.amount.toLocaleString() + " (" + splitText + ")\n";
+        total += it.amount;
+      });
+      msg += "\n💰 ยอดรวม: ฿" + total.toLocaleString() + " บาท";
+
+      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
+      window.open(lineUrl, '_blank');
+    }
+
+    function shareSettleToLineApp() {
+      const { netDebt } = calculateDebt();
+      const rounded = Math.round(Math.abs(netDebt) * 100) / 100;
+      const u1 = appConfig.user1;
+      const u2 = appConfig.user2;
+      const payer = netDebt > 0 ? u2 : u1;
+      const receiver = netDebt > 0 ? u1 : u2;
+      const inputEl = document.getElementById('in-settle-amt');
+      const amt = (inputEl && parseFloat(inputEl.value)) ? parseFloat(inputEl.value) : rounded;
+
+      let msg = "🤝 Lunar — เคลียร์หนี้เรียบร้อยแล้ว!\n";
+      msg += "💸 ยอดโอนเคลียร์: ฿" + amt.toLocaleString() + " บาท\n";
+      msg += "📤 ผู้โอน: " + payer.avatar + " " + payer.name + "\n";
+      msg += "📥 ผู้รับ: " + receiver.avatar + " " + receiver.name + "\n";
+      msg += "📅 วันที่: " + getTodayThaiDate() + "\n";
+      msg += "🎉 สถานะ: ปรับยอดหนี้คงค้างเป็น 0 เรียบร้อย!";
+
+      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
+      window.open(lineUrl, '_blank');
     }
 
     function closeBatchConfirmModal() {

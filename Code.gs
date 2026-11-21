@@ -13,6 +13,17 @@ const LINE_CHANNEL_ACCESS_TOKEN = "5CXBip5j+PV/RTF6HTSc+g+15NtALJt4emUt12ptIJEJ8
 const LINE_TARGET_ID = "C6d5e97065697f13cc73445b5f1ac32f3";
 
 /**
+ * ⭐ ฟังก์ชันหลักสำหรับกด "เรียกใช้" (Run) ใน Apps Script เพื่อขอสิทธิ์ LINE และทดสอบส่งข้อความในคลิกเดียว
+ */
+function authorizeAndTestLine() {
+  const ss = getSpreadsheet();
+  initSheets(ss);
+  const result = testLineSendDirect(ss);
+  Logger.log(JSON.stringify(result));
+  return result;
+}
+
+/**
  * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
  */
 function getSpreadsheet() {
