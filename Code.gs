@@ -3,14 +3,68 @@
  * เชื่อมต่อ Google Sheets สำหรับบันทึกรายจ่าย 2 คนและเคลียร์หนี้
  */
 
+const SPREADSHEET_ID = "1C2zEgZLgSyGdD_Ef9gEezVYredxy1-SgYfHpOPcEV7o";
 const SHEET_TX_NAME = "Transactions";
 const SHEET_CFG_NAME = "Config";
 
+/**
+ * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
+ */
+function getSpreadsheet() {
+  try {
+    const active = SpreadsheetApp.getActiveSpreadsheet();
+    if (active) return active;
+  } catch (e) {}
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
+/**
+ * ฟังก์ชันสำหรับทดสอบรันใน Apps Script Editor เพื่อขอสิทธิ์ (Authorize)
+ */
+function initSheets(ss) {
+  if (!ss) ss = getSpreadsheet();
+  
+  let txSheet = ss.getSheetByName(SHEET_TX_NAME);
+  if (!txSheet) {
+    txSheet = ss.insertSheet(SHEET_TX_NAME);
+    const headers = [
+      "ID", "วันที่ (พ.ศ.)", "เวลา", "ประเภท", "ผู้จ่าย/ผู้โอน",
+      "ผู้รับ", "ไอคอน", "หมวดหมู่", "จำนวนเงิน (บาท)", "วิธีหาร", "หมายเหตุ", "Timestamp"
+    ];
+    txSheet.appendRow(headers);
+    txSheet.getRange("A1:L1")
+      .setFontWeight("bold")
+      .setBackground("#FFCCD5")
+      .setFontColor("#C92A2A")
+      .setHorizontalAlignment("center");
+    txSheet.setFrozenRows(1);
+  }
+
+  let cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
+  if (!cfgSheet) {
+    cfgSheet = ss.insertSheet(SHEET_CFG_NAME);
+    cfgSheet.appendRow(["Key", "Value"]);
+    cfgSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#FFE3E8");
+  }
+
+  Logger.log("✅ สร้าง/ตรวจสอบ Sheet เรียบร้อยแล้ว: " + ss.getName());
+  return "OK";
+}
+
+/**
+ * ฟังก์ชันทดสอบการเชื่อมต่อ
+ */
+function testConnection() {
+  return initSheets();
+}
+
+/**
+ * จัดการคำขอ HTTP GET (ดึงข้อมูล)
+ */
 function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "getAll";
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    
+    const ss = getSpreadsheet();
     initSheets(ss);
 
     if (action === "getAll") {
@@ -29,12 +83,14 @@ function doGet(e) {
   }
 }
 
+/**
+ * จัดการคำขอ HTTP POST (บันทึก / ลบ / เคลียร์หนี้)
+ */
 function doPost(e) {
   try {
     const postData = JSON.parse(e.postData.contents);
     const action = postData.action;
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    
+    const ss = getSpreadsheet();
     initSheets(ss);
 
     if (action === "addBatch") {
@@ -110,31 +166,6 @@ function doPost(e) {
     return createJsonResponse({ status: "unknown_action" });
   } catch (err) {
     return createJsonResponse({ status: "error", message: err.toString() });
-  }
-}
-
-function initSheets(ss) {
-  let txSheet = ss.getSheetByName(SHEET_TX_NAME);
-  if (!txSheet) {
-    txSheet = ss.insertSheet(SHEET_TX_NAME);
-    const headers = [
-      "ID", "วันที่ (พ.ศ.)", "เวลา", "ประเภท", "ผู้จ่าย/ผู้โอน",
-      "ผู้รับ", "ไอคอน", "หมวดหมู่", "จำนวนเงิน (บาท)", "วิธีหาร", "หมายเหตุ", "Timestamp"
-    ];
-    txSheet.appendRow(headers);
-    txSheet.getRange("A1:L1")
-      .setFontWeight("bold")
-      .setBackground("#FFCCD5")
-      .setFontColor("#C92A2A")
-      .setHorizontalAlignment("center");
-    txSheet.setFrozenRows(1);
-  }
-
-  let cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
-  if (!cfgSheet) {
-    cfgSheet = ss.insertSheet(SHEET_CFG_NAME);
-    cfgSheet.appendRow(["Key", "Value"]);
-    cfgSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#FFE3E8");
   }
 }
 
