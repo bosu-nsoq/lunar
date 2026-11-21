@@ -1,11 +1,16 @@
 /**
  * Lunar (NB) Backend - Google Apps Script (Code.gs)
  * เชื่อมต่อ Google Sheets สำหรับบันทึกรายจ่าย 2 คนและเคลียร์หนี้
+ * รองรับการแจ้งเตือนผ่าน LINE Messaging API
  */
 
 const SPREADSHEET_ID = "1C2zEgZLgSyGdD_Ef9gEezVYredxy1-SgYfHpOPcEV7o";
 const SHEET_TX_NAME = "Transactions";
 const SHEET_CFG_NAME = "Config";
+
+// ตั้งค่า LINE Notification (สามารถใส่ Token และ User/Group ID ได้ที่นี่ หรือระบุใน Sheet Config)
+const LINE_CHANNEL_ACCESS_TOKEN = ""; // ใส่ Channel Access Token ของ LINE Messaging API
+const LINE_TARGET_ID = "";            // ใส่ User ID หรือ Group ID ที่ต้องการให้แจ้งเตือน
 
 /**
  * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
@@ -112,6 +117,9 @@ function doPost(e) {
       if (rowsToAdd.length > 0) {
         const lastRow = txSheet.getLastRow();
         txSheet.getRange(lastRow + 1, 1, rowsToAdd.length, 12).setValues(rowsToAdd);
+
+        // ส่งการแจ้งเตือนผ่าน LINE
+        notifyLineBatch(items, ss);
       }
 
       return createJsonResponse({ status: "success", added: rowsToAdd.length });
@@ -151,6 +159,10 @@ function doPost(e) {
         settleTx.note || "เคลียร์หนี้เรียบร้อย",
         settleTx.timestamp
       ]);
+
+      // ส่งการแจ้งเตือนผ่าน LINE
+      notifyLineSettle(settleTx, ss);
+
       return createJsonResponse({ status: "success", message: "Settled recorded" });
     }
 
@@ -223,6 +235,96 @@ function saveConfigData(ss, cfg) {
       cfgSheet.appendRow([k, typeof cfg[k] === "object" ? JSON.stringify(cfg[k]) : cfg[k]]);
     }
   }
+}
+
+/**
+ * ระบบส่งการแจ้งเตือนผ่าน LINE Messaging API
+ */
+function sendLinePush(messageText, ss) {
+  let token = LINE_CHANNEL_ACCESS_TOKEN;
+  let targetId = LINE_TARGET_ID;
+
+  // หากไม่ได้ระบุในโค้ด ให้ค้นหาจาก Sheet Config
+  if (!token || !targetId) {
+    const cfg = getConfigData(ss);
+    if (cfg) {
+      token = token || cfg["line_token"];
+      targetId = targetId || cfg["line_target_id"];
+    }
+  }
+
+  if (!token || !targetId) {
+    Logger.log("ไม่ได้กำหนด LINE Token หรือ Target ID");
+    return;
+  }
+
+  const url = "https://api.line.me/v2/bot/message/push";
+  const payload = {
+    to: targetId,
+    messages: [
+      {
+        type: "text",
+        text: messageText
+      }
+    ]
+  };
+
+  try {
+    UrlFetchApp.fetch(url, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+  } catch (err) {
+    Logger.log("LINE Notification Error: " + err.toString());
+  }
+}
+
+function notifyLineBatch(items, ss) {
+  if (!items || items.length === 0) return;
+  const cfg = getConfigData(ss) || {};
+  const payerKey = items[0].payerKey;
+  let payerName = "ผู้ใช้";
+  if (cfg[payerKey] && cfg[payerKey].name) {
+    payerName = cfg[payerKey].name;
+  } else if (payerKey === "user1") {
+    payerName = "บอส";
+  } else if (payerKey === "user2") {
+    payerName = "คู่หู";
+  }
+
+  let msg = "🌙 Lunar — บันทึกรายจ่ายใหม่!\n";
+  msg += "👤 ผู้บันทึก: " + payerName + "\n";
+  msg += "📅 วันที่: " + (items[0].dateStr || "") + " " + (items[0].timeStr || "") + "\n\n";
+  
+  let total = 0;
+  items.forEach(it => {
+    const splitLabel = it.splitMode === "half" ? "จ่ายคนละครึ่ง" : "จ่ายเต็ม";
+    msg += "• " + it.catIcon + " " + it.note + " : ฿" + it.amount.toLocaleString() + " (" + splitLabel + ")\n";
+    total += it.amount;
+  });
+
+  msg += "\n💰 ยอดรวมรอบนี้: ฿" + total.toLocaleString() + " บาท";
+
+  sendLinePush(msg, ss);
+}
+
+function notifyLineSettle(settleTx, ss) {
+  const cfg = getConfigData(ss) || {};
+  let settlerName = (cfg[settleTx.settlerKey] && cfg[settleTx.settlerKey].name) || "ผู้โอน";
+  let receiverName = (cfg[settleTx.receiverKey] && cfg[settleTx.receiverKey].name) || "ผู้รับ";
+
+  let msg = "🤝 Lunar — แจ้งเตือนการเคลียร์หนี้!\n\n";
+  msg += "💸 ยอดเงิน: ฿" + settleTx.amount.toLocaleString() + " บาท\n";
+  msg += "🔄 " + settlerName + " ➜ " + receiverName + "\n";
+  msg += "📅 วันที่: " + settleTx.dateStr + " " + settleTx.timeStr + "\n";
+  msg += "✨ สถานะ: เคลียร์ยอดเรียบร้อยแล้ว";
+
+  sendLinePush(msg, ss);
 }
 
 function createJsonResponse(data) {

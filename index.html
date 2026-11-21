@@ -13,7 +13,7 @@
   <meta property="og:description" content="สำหรับใช้บันทึกรายจ่าย">
   <meta property="og:image" content="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://bosu-nsoq.github.io/nb/">
+  <meta property="og:url" content="https://bosu-nsoq.github.io/lunar/">
 
   <!-- Favicon & Apple iOS Standalone App Meta Tags -->
   <link rel="icon" type="image/png" href="https://i.postimg.cc/xC1sKNwZ/Lunar.png">
@@ -949,10 +949,10 @@
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">วิธีหารเงิน</div>
             <div class="split-row">
               <button type="button" id="split-half" class="split-btn active" onclick="setSplitMode('half')">
-                <span>🤝</span> <span>คนละครึ่ง</span>
+                <span>🤝</span> <span>จ่ายคนละครึ่ง</span>
               </button>
               <button type="button" id="split-full" class="split-btn" onclick="setSplitMode('full')">
-                <span>🎁</span> <span>จ่ายให้ 100%</span>
+                <span>🎁</span> <span>จ่ายเต็ม</span>
               </button>
             </div>
           </div>
@@ -1031,7 +1031,7 @@
 
         <!-- Button: เคลียร์หนี้ -->
         <button type="button" class="btn-add-batch" onclick="openSettleModal()" style="padding: 13px; font-size: 15px;">
-          <span>💸</span> <span>เคลียร์หนี้ / ชำระเงินคืน</span>
+          <span>💸</span> <span>เคลียร์หนี้</span>
         </button>
 
         <div class="glass-card" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted);">
@@ -1253,7 +1253,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbx_fdQJCcCIcdhzynjL97VFOxGL0s0kMBw3GNEJ4m_srWaX5EwhqZOQkEC5eePpmyCo/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwc8PeXVbS0VIWM4z2PGxBbcc4Pn_KI85C4dhRV3mDXvC1SbxblwGj7WN4VTlsIFsVg/exec';
 
     // Default configuration
     let appConfig = {
@@ -1604,7 +1604,7 @@
       let html = '';
       batchQueue.forEach((it) => {
         const payer = appConfig[it.payerKey] || { name: 'ผู้บันทึก', avatar: '👤' };
-        const splitLabel = it.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
+        const splitLabel = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
         html += `
           <div class="batch-item">
             <div class="batch-item-left">
@@ -1637,7 +1637,7 @@
 
       let html = '';
       batchQueue.forEach((it, idx) => {
-        const splitText = it.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
+        const splitText = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
         html += `
           <div class="confirm-review-row">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1802,7 +1802,7 @@
           `;
         } else {
           const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
-          const splitLabel = tx.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
+          const splitLabel = tx.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
           html += `
             <div class="recent-row">
               <div class="recent-left">
@@ -1856,7 +1856,7 @@
           `;
         } else {
           const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
-          const splitLabel = tx.splitMode === 'half' ? 'คนละครึ่ง' : 'จ่ายให้ 100%';
+          const splitLabel = tx.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
           html += `
             <div class="recent-row" style="padding:8px 12px;">
               <div class="recent-left">
