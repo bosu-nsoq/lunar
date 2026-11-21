@@ -5,46 +5,53 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   
-  <title>DuoPay - บันทึกรายจ่าย 2 คน</title>
+  <title>NB - บันทึกรายจ่าย 2 คน</title>
   
-  <!-- Meta tags for PWA & iOS -->
+  <!-- Open Graph & Meta tags -->
   <meta name="description" content="แอปบันทึกรายจ่ายและเคลียร์หนี้สำหรับ 2 คน">
-  <meta property="og:title" content="DuoPay - บันทึกรายจ่าย 2 คน">
+  <meta property="og:title" content="NB - บันทึกรายจ่าย 2 คน">
   <meta property="og:description" content="แอปบันทึกรายจ่ายและเคลียร์หนี้สำหรับ 2 คน จอไม่เลื่อน เน้นไอคอน">
+  <meta property="og:image" content="https://i.postimg.cc/Kc6BXB17/NB.png">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bosu-nsoq.github.io/nb/">
-  <meta name="theme-color" content="#FF6B8B">
+
+  <!-- Favicon & Apple iOS Standalone App Meta Tags -->
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <link rel="shortcut icon" type="image/png" href="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/Kc6BXB17/NB.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF8DA1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="DuoPay">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/fluent-emoji:money-with-wings.svg">
-  <link rel="apple-touch-icon" href="https://api.iconify.design/fluent-emoji:money-with-wings.svg">
+  <meta name="apple-mobile-web-app-title" content="NB">
 
-  <!-- Font Mali -->
+  <!-- Google Font: Mali -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --primary: #FF5E7E;
-      --primary-dark: #E03E60;
-      --primary-light: #FFE5EC;
-      --secondary: #6C5CE7;
-      --secondary-light: #EDE9FE;
-      --accent: #00B894;
-      --accent-light: #D4EDDA;
-      --danger: #FF7675;
-      --bg: #F8F9FD;
-      --card-bg: #FFFFFF;
-      --text: #2D3436;
-      --text-muted: #636E72;
-      --border: #F1F2F6;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-      --radius: 18px;
+      --pink-primary: #FF758F;
+      --pink-dark: #E05370;
+      --pink-light: #FFE5EC;
+      --pink-soft: #FFF0F5;
+      --pink-border: #FFCCD5;
+      --pink-gradient: linear-gradient(135deg, #FF758F, #FF9A9E);
+      --bg-page: #FFF5F7;
+      --card-white: #FFFFFF;
+      --card-alt: #FFF9FA;
+      --text-main: #3D3A45;
+      --text-muted: #7A7585;
+      --accent-mint: #52B788;
+      --accent-mint-light: #D8F3DC;
+      --danger: #FF6B6B;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-soft: 0 4px 14px rgba(255, 117, 143, 0.08);
+      --shadow-float: 0 8px 24px rgba(255, 117, 143, 0.16);
     }
 
     * {
@@ -53,128 +60,153 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
       user-select: none;
     }
 
+    /* ล็อกหน้าจอแนวตั้งให้นิ่งสนิท ไม่เลื่อนไปมา */
     html, body {
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      overflow: hidden; /* ล็อกหน้าจอแนวตั้งไม่ให้เลื่อน */
-      background: #FAFAFA;
-      color: var(--text);
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      overscroll-behavior: none;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* Container ขนาดมือถือแนวตั้ง */
     .app-viewport {
       width: 100%;
       max-width: 480px;
       height: 100%;
       max-height: 100dvh;
-      background: var(--bg);
+      background: var(--bg-page);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 40px rgba(0,0,0,0.08);
+      box-shadow: 0 0 35px rgba(255, 154, 158, 0.2);
     }
 
-    /* Header Bar */
+    /* Header Bar สลับชมพูพาสเทลและขาว */
     .app-header {
       background: #FFFFFF;
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1.5px solid var(--pink-border);
       flex-shrink: 0;
       z-index: 10;
-    }
-
-    .brand-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--primary);
       white-space: nowrap;
     }
 
-    .debt-badge {
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+    }
+    .brand-logo-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 2px 6px rgba(255, 117, 143, 0.25);
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--pink-dark);
+      white-space: nowrap;
+    }
+
+    .header-debt-badge {
       font-size: 11px;
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 20px;
-      background: var(--primary-light);
-      color: var(--primary-dark);
+      background: var(--pink-light);
+      color: var(--pink-dark);
       white-space: nowrap;
-      max-width: 170px;
+      max-width: 160px;
       overflow: hidden;
       text-overflow: ellipsis;
       cursor: pointer;
-      transition: transform 0.15s ease;
+      border: 1px solid var(--pink-border);
     }
-    .debt-badge:active { transform: scale(0.96); }
 
-    .user-pill {
+    .user-pill-btn {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: var(--secondary-light);
-      color: var(--secondary);
+      gap: 5px;
+      background: var(--pink-soft);
+      border: 1px solid var(--pink-border);
+      color: var(--pink-dark);
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
+      white-space: nowrap;
+      transition: transform 0.15s;
     }
-    .user-pill:active { transform: scale(0.95); }
+    .user-pill-btn:active { transform: scale(0.95); }
 
-    /* Main Content Area */
-    .app-content {
+    /* Main View Area */
+    .app-main {
       flex: 1;
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px 14px 80px 14px;
-      position: relative;
+      padding: 10px 12px 76px 12px;
+      gap: 10px;
+      overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
-    .app-content::-webkit-scrollbar { display: none; }
+    .app-main::-webkit-scrollbar { display: none; }
 
-    /* Screen View */
-    .view-panel {
+    .view-section {
       display: none;
       flex-direction: column;
-      gap: 12px;
-      animation: fadeIn 0.25s ease-out;
+      gap: 10px;
+      animation: fadeIn 0.2s ease-out;
     }
-    .view-panel.active { display: flex; }
+    .view-section.active { display: flex; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Cards */
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
+    /* Cards - โทนขาวสลับชมพูพาสเทล */
+    .card-white {
+      background: var(--card-white);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      border: 1.5px solid var(--pink-border);
+      box-shadow: var(--shadow-soft);
+    }
+    .card-pink {
+      background: var(--card-alt);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      border: 1.5px solid var(--pink-border);
+      box-shadow: var(--shadow-soft);
     }
 
-    /* Payer Switcher */
-    .payer-toggle-group {
+    /* Payer Selector Toggle */
+    .payer-toggle {
       display: flex;
-      background: #F1F2F6;
-      border-radius: 14px;
+      background: #FFE8ED;
+      border-radius: 12px;
       padding: 3px;
       gap: 4px;
     }
@@ -183,12 +215,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 11px;
+      gap: 5px;
+      padding: 7px 8px;
+      border-radius: 10px;
       border: none;
       background: transparent;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
@@ -197,34 +229,32 @@
     }
     .payer-btn.active {
       background: #FFFFFF;
-      color: var(--primary);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      color: var(--pink-dark);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(255, 117, 143, 0.15);
     }
 
-    /* Date & Time Row (Thai dd/mm/yyyy พ.ศ. Overlay Pattern) */
+    /* Thai Date & Time Row */
     .datetime-bar {
       display: flex;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 6px;
     }
-    .dt-input-wrap {
+    .dt-wrap {
       position: relative;
       flex: 1;
       display: flex;
       align-items: center;
-      background: #F8F9FA;
-      border: 1px solid var(--border);
+      background: #FFFFFF;
+      border: 1.5px solid var(--pink-border);
       border-radius: 12px;
       padding: 6px 10px;
     }
-    .dt-input-wrap span.icon {
-      font-size: 15px;
-      margin-right: 6px;
-    }
-    .dt-display {
+    .dt-wrap .icon { font-size: 14px; margin-right: 5px; }
+    .dt-text {
       font-size: 12.5px;
       font-weight: 600;
-      color: var(--text);
+      color: var(--text-main);
       width: 100%;
       border: none;
       background: transparent;
@@ -246,173 +276,150 @@
       opacity: 0; cursor: pointer;
     }
 
-    /* Icon Categories Grid */
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin: 4px 0;
-    }
-    .cat-btn {
+    /* Pop-up Category Button (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ) */
+    .cat-popup-trigger {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 8px 4px;
-      background: #F8F9FA;
-      border: 2px solid transparent;
+      justify-content: space-between;
+      width: 100%;
+      background: var(--pink-soft);
+      border: 1.5px dashed var(--pink-primary);
       border-radius: 14px;
+      padding: 8px 14px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.15s;
     }
-    .cat-btn .icon {
-      font-size: 24px;
-      margin-bottom: 2px;
-      transition: transform 0.15s;
-    }
-    .cat-btn .label {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-    .cat-btn:active { transform: scale(0.94); }
-    .cat-btn.selected {
-      background: var(--primary-light);
-      border-color: var(--primary);
-    }
-    .cat-btn.selected .icon { transform: scale(1.15); }
-    .cat-btn.selected .label { color: var(--primary-dark); font-weight: 700; }
-
-    /* Amount Input & Split Mode */
-    .amount-box {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .amount-field-wrap {
+    .cat-popup-trigger:active { transform: scale(0.98); background: var(--pink-light); }
+    .cat-current-info {
       display: flex;
       align-items: center;
-      background: #F8F9FA;
-      border: 2px solid var(--border);
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--pink-dark);
+    }
+    .cat-current-info .icon { font-size: 22px; }
+    .cat-change-tag {
+      font-size: 11px;
+      color: var(--pink-dark);
+      background: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--pink-border);
+    }
+
+    /* Amount Input Field (เอาปุ่มแนะนำยอดออกแล้ว) */
+    .amount-input-box {
+      display: flex;
+      align-items: center;
+      background: #FFFFFF;
+      border: 2px solid var(--pink-border);
       border-radius: 14px;
-      padding: 6px 12px;
+      padding: 6px 14px;
       transition: border-color 0.2s;
     }
-    .amount-field-wrap:focus-within {
-      border-color: var(--primary);
-      background: #FFFFFF;
+    .amount-input-box:focus-within {
+      border-color: var(--pink-primary);
+      box-shadow: 0 0 0 3px rgba(255, 117, 143, 0.15);
     }
-    .currency-symbol {
-      font-size: 20px;
+    .amount-symbol {
+      font-size: 22px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--pink-primary);
       margin-right: 8px;
     }
-    .amount-input {
+    .amount-input-ctrl {
       flex: 1;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       border: none;
       background: transparent;
       outline: none;
-      color: var(--text);
+      color: var(--text-main);
     }
-    .amount-input::placeholder { color: #CBD5E1; }
-
-    .quick-chips {
-      display: flex;
-      gap: 6px;
-    }
-    .chip {
-      flex: 1;
-      padding: 4px 6px;
-      background: #F1F2F6;
-      border: none;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-    .chip:active { background: #E2E8F0; }
+    .amount-input-ctrl::placeholder { color: #E2C2C9; }
 
     /* Split Options */
-    .split-options {
+    .split-row {
       display: flex;
       gap: 6px;
-      margin-top: 4px;
     }
     .split-btn {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
       padding: 7px 6px;
-      background: #F8F9FA;
-      border: 1.5px solid var(--border);
-      border-radius: 11px;
-      font-size: 11.5px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--pink-border);
+      border-radius: 12px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s;
     }
     .split-btn.active {
-      background: var(--secondary-light);
-      border-color: var(--secondary);
-      color: var(--secondary);
+      background: var(--pink-light);
+      border-color: var(--pink-primary);
+      color: var(--pink-dark);
       font-weight: 700;
     }
 
-    /* Note Input */
-    .note-input {
+    /* Note Input (ช่องพิมพ์หมายเหตุ) */
+    .note-input-ctrl {
       width: 100%;
-      background: #F8F9FA;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px 10px;
-      font-size: 12px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--pink-border);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12.5px;
       outline: none;
-      color: var(--text);
+      color: var(--text-main);
+      transition: border-color 0.2s;
     }
-    .note-input:focus { border-color: var(--primary); background: #FFF; }
+    .note-input-ctrl:focus {
+      border-color: var(--pink-primary);
+      background: #FFF;
+    }
+    .note-input-ctrl::placeholder { color: #A098A8; }
 
-    /* Add Item to Batch Button */
-    .btn-add-item {
+    /* Button: เพิ่มเข้ารายการ */
+    .btn-add-batch {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
       padding: 10px;
-      background: linear-gradient(135deg, #FF6B8B, #FF8E53);
+      background: var(--pink-gradient);
       color: #FFFFFF;
       border: none;
       border-radius: 14px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(255, 107, 139, 0.35);
+      box-shadow: 0 4px 12px rgba(255, 117, 143, 0.3);
       transition: transform 0.15s ease;
     }
-    .btn-add-item:active { transform: scale(0.97); }
+    .btn-add-batch:active { transform: scale(0.97); }
 
-    /* Batch Queue Card */
+    /* Batch Queue Card (ตะกร้ารอส่งหลายรายการ) */
     .batch-card {
       background: #FFFFFF;
-      border-radius: var(--radius);
-      border: 2px dashed #E2E8F0;
-      padding: 12px;
+      border-radius: var(--radius-lg);
+      border: 2px dashed var(--pink-border);
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-    .batch-header {
+    .batch-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--text-muted);
     }
@@ -420,7 +427,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 140px;
+      max-height: 120px;
       overflow-y: auto;
       padding-right: 2px;
     }
@@ -428,7 +435,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #F8F9FD;
+      background: var(--pink-soft);
+      border: 1px solid var(--pink-border);
       padding: 6px 10px;
       border-radius: 10px;
       font-size: 12px;
@@ -436,176 +444,151 @@
     .batch-item-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      overflow: hidden;
     }
-    .batch-item-icon { font-size: 18px; }
-    .batch-item-title { font-weight: 600; color: var(--text); }
-    .batch-item-tag { font-size: 10px; color: var(--text-muted); }
+    .batch-item-icon { font-size: 18px; flex-shrink: 0; }
+    .batch-item-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 170px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
     .batch-item-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .batch-item-amt { font-weight: 700; color: var(--primary); font-size: 13px; }
+    .batch-item-amt { font-weight: 700; color: var(--pink-dark); }
     .batch-item-del {
       border: none;
       background: transparent;
-      color: #A0AEC0;
+      color: #C0A8AF;
       cursor: pointer;
       font-size: 15px;
       padding: 2px;
     }
     .batch-item-del:hover { color: var(--danger); }
 
-    .btn-submit-batch {
+    /* Button: บันทึกข้อมูลทั้งหมด (Save All) */
+    .btn-submit-all {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       background: linear-gradient(135deg, #00B894, #00CEC9);
       color: #FFFFFF;
       border: none;
       border-radius: 14px;
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 184, 148, 0.35);
+      box-shadow: 0 4px 12px rgba(0, 184, 148, 0.28);
       transition: transform 0.15s ease;
     }
-    .btn-submit-batch:active { transform: scale(0.97); }
-    .btn-submit-batch:disabled {
-      background: #CBD5E1;
+    .btn-submit-all:active { transform: scale(0.97); }
+    .btn-submit-all:disabled {
+      background: #D9D4DD;
       box-shadow: none;
       cursor: not-allowed;
     }
 
-    /* Settlement & Balance Tab Styles */
-    .balance-hero {
-      background: linear-gradient(135deg, #6C5CE7, #a367dc);
-      border-radius: 20px;
-      padding: 18px 16px;
-      color: #FFF;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(108, 92, 231, 0.28);
-      position: relative;
-      overflow: hidden;
-    }
-    .balance-hero::after {
-      content: '';
-      position: absolute;
-      right: -20px;
-      bottom: -20px;
-      width: 90px;
-      height: 90px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 50%;
-    }
-    .balance-subtitle { font-size: 12px; opacity: 0.9; margin-bottom: 4px; }
-    .balance-amount { font-size: 30px; font-weight: 700; margin: 4px 0; letter-spacing: -0.5px; }
-    .balance-desc { font-size: 13px; font-weight: 600; opacity: 0.95; }
-
-    .debt-vs-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .user-stat-card {
-      background: #FFF;
-      border-radius: 16px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-    }
-    .user-stat-card .avatar { font-size: 28px; margin-bottom: 2px; }
-    .user-stat-card .name { font-size: 13px; font-weight: 700; color: var(--text); }
-    .user-stat-card .paid-amt { font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 4px; }
-    .user-stat-card .paid-label { font-size: 10.5px; color: var(--text-muted); }
-
-    .btn-settle-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #FF6B8B, #FF8E53);
-      color: #FFF;
-      border: none;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(255, 107, 139, 0.35);
-      transition: transform 0.15s;
-    }
-    .btn-settle-action:active { transform: scale(0.97); }
-
-    /* History List */
-    .history-card {
-      background: #FFF;
-      border-radius: 14px;
+    /* รายการล่าสุด พร้อมไอคอนลบ */
+    .recent-section {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--pink-border);
       padding: 10px 12px;
-      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .recent-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--pink-dark);
+      padding-bottom: 4px;
+      border-bottom: 1px dashed var(--pink-border);
     }
-    .hist-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #F1F2F6;
+    .recent-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
+      justify-content: space-between;
+      background: var(--pink-soft);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 11.5px;
     }
-    .hist-icon.settle { background: var(--accent-light); }
-    .hist-info { flex: 1; overflow: hidden; }
-    .hist-title {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--text);
+    .recent-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      overflow: hidden;
+    }
+    .recent-icon { font-size: 17px; }
+    .recent-note {
+      font-weight: 600;
+      color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 150px;
     }
-    .hist-sub {
-      font-size: 10.5px;
-      color: var(--text-muted);
+    .recent-sub { font-size: 10px; color: var(--text-muted); }
+    .recent-right {
       display: flex;
-      gap: 6px;
+      align-items: center;
+      gap: 8px;
     }
-    .hist-amt {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      text-align: right;
-      white-space: nowrap;
+    .recent-amt { font-weight: 700; color: var(--pink-dark); }
+    .btn-del-item {
+      border: none;
+      background: #FFE8ED;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      transition: background 0.15s;
     }
-    .hist-amt.settle { color: var(--accent); }
+    .btn-del-item:active { background: #FFD3DC; }
+
+    /* Settlement Hero Card */
+    .balance-hero {
+      background: var(--pink-gradient);
+      border-radius: 20px;
+      padding: 16px 14px;
+      color: #FFF;
+      text-align: center;
+      box-shadow: var(--shadow-float);
+    }
+    .balance-title { font-size: 12px; opacity: 0.95; }
+    .balance-amount { font-size: 32px; font-weight: 700; margin: 3px 0; }
+    .balance-desc { font-size: 13px; font-weight: 600; }
 
     /* Bottom Navigation Bar */
-    .bottom-nav {
+    .app-nav {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 64px;
+      height: 62px;
       background: #FFFFFF;
-      border-top: 1px solid var(--border);
+      border-top: 1.5px solid var(--pink-border);
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 0 8px;
+      padding: 0 4px;
       z-index: 20;
     }
-    .nav-btn {
+    .nav-item {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -613,102 +596,196 @@
       justify-content: center;
       border: none;
       background: transparent;
-      color: #94A3B8;
+      color: #A098A8;
       cursor: pointer;
-      gap: 3px;
+      gap: 2px;
       padding: 6px 0;
       transition: color 0.15s;
     }
-    .nav-btn .icon { font-size: 22px; }
-    .nav-btn .label { font-size: 10.5px; font-weight: 600; }
-    .nav-btn.active { color: var(--primary); }
-    .nav-btn.active .icon { transform: scale(1.1); }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item .label { font-size: 10.5px; font-weight: 600; }
+    .nav-item.active { color: var(--pink-primary); }
+    .nav-item.active .icon { transform: scale(1.1); }
 
-    /* PIN Modal Pad */
-    .modal-overlay {
+    /* ===================================================
+       FULLSCREEN PIN LOCK SCREEN (หน้ากด PIN ก่อนเข้าใช้งาน)
+       =================================================== */
+    .pin-lock-screen {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFEBF0 100%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      gap: 14px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .pin-lock-screen.hidden { display: none; }
+
+    .pin-app-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(255, 117, 143, 0.35);
+      margin-bottom: 2px;
+    }
+    .pin-screen-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--pink-dark);
+    }
+    .pin-screen-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .pin-dots-row {
+      display: flex;
+      gap: 14px;
+      margin: 8px 0;
+    }
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--pink-border);
+      background: #FFFFFF;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .pin-dot.filled {
+      background: var(--pink-primary);
+      border-color: var(--pink-primary);
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255, 117, 143, 0.4);
+    }
+
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 260px;
+      margin-top: 6px;
+    }
+    .pin-key {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto;
+      border-radius: 50%;
+      border: 1.5px solid var(--pink-border);
+      background: #FFFFFF;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(255, 117, 143, 0.1);
+      transition: all 0.1s;
+    }
+    .pin-key:active {
+      background: var(--pink-light);
+      transform: scale(0.92);
+      border-color: var(--pink-primary);
+    }
+    .pin-key.fn {
+      font-size: 14px;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* ===================================================
+       MODAL & POPUP DIALOGS (Bottom Sheets)
+       =================================================== */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(45, 30, 40, 0.45);
+      backdrop-filter: blur(3px);
       display: none;
       align-items: flex-end;
       justify-content: center;
       z-index: 100;
-      animation: fadeIn 0.2s ease-out;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-backdrop.active { display: flex; animation: fadeIn 0.2s ease-out; }
 
     .bottom-sheet {
       width: 100%;
       background: #FFFFFF;
       border-top-left-radius: 24px;
       border-top-right-radius: 24px;
-      padding: 20px 20px 24px 20px;
+      border-top: 2px solid var(--pink-border);
+      padding: 18px 18px 24px 18px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      animation: slideUp 0.25s ease-out;
-      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+      gap: 12px;
+      box-shadow: 0 -8px 28px rgba(255, 117, 143, 0.2);
+      animation: slideUp 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
     @keyframes slideUp {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
 
-    .pin-dots {
-      display: flex;
-      gap: 12px;
-      margin: 8px 0;
-    }
-    .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 2px solid #CBD5E1;
-      background: transparent;
-      transition: all 0.2s;
-    }
-    .dot.filled {
-      background: var(--primary);
-      border-color: var(--primary);
-      transform: scale(1.15);
-    }
-
-    .pin-numpad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      width: 100%;
-      max-width: 260px;
-    }
-    .num-btn {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto;
-      border-radius: 50%;
-      border: 1px solid #F1F2F6;
-      background: #F8F9FD;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
+    .modal-head {
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      justify-content: space-between;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--pink-dark);
     }
-    .num-btn:active { background: #E2E8F0; transform: scale(0.92); }
-    .num-btn.fn { font-size: 15px; color: var(--text-muted); background: transparent; border: none; }
+    .modal-close-btn {
+      border: none;
+      background: #FFE8ED;
+      color: var(--pink-dark);
+      font-size: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* Category Grid Inside Popup */
+    .cat-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .cat-select-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 4px;
+      background: var(--pink-soft);
+      border: 1.5px solid var(--pink-border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cat-select-cell:active { transform: scale(0.94); background: var(--pink-light); }
+    .cat-select-cell .icon { font-size: 26px; margin-bottom: 2px; }
+    .cat-select-cell .name { font-size: 11px; font-weight: 600; color: var(--text-main); }
 
     /* Toast Notification */
-    .toast-msg {
+    .toast-box {
       position: absolute;
       top: 14px;
       left: 50%;
       transform: translateX(-50%) translateY(-50px);
       background: #2D3436;
-      color: #FFF;
+      color: #FFFFFF;
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 12px;
@@ -716,14 +793,14 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      z-index: 200;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
       opacity: 0;
       pointer-events: none;
       white-space: nowrap;
     }
-    .toast-msg.show {
+    .toast-box.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
@@ -731,381 +808,416 @@
 </head>
 <body>
 
-  <!-- Toast Notification Box -->
-  <div id="toast" class="toast-msg">
+  <!-- Toast Message -->
+  <div id="toast" class="toast-box">
     <span id="toast-icon">✨</span>
-    <span id="toast-text">ข้อความ</span>
+    <span id="toast-text">แจ้งเตือน</span>
   </div>
 
   <div class="app-viewport">
     
-    <!-- Top Header -->
-    <header class="app-header">
-      <div class="brand-title">
-        <span>💸</span>
-        <span>DuoPay</span>
+    <!-- ========================================================
+         PIN LOCK SCREEN (หน้ากด PIN ก่อนเข้าใช้งาน)
+         ======================================================== -->
+    <div id="screen-pin-lock" class="pin-lock-screen">
+      <img src="https://i.postimg.cc/Kc6BXB17/NB.png" alt="NB Logo" class="pin-app-logo">
+      <div class="pin-screen-title">ยินดีต้อนรับสู่ NB</div>
+      <div class="pin-screen-desc">กดรหัส PIN 4 หลัก เพื่อเข้าสู่ระบบของคุณ</div>
+
+      <!-- 4 PIN Dots -->
+      <div class="pin-dots-row">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
       </div>
 
-      <!-- Debt status summary pill -->
-      <div id="header-debt-badge" class="debt-badge" onclick="switchView('balance')">
+      <!-- Keypad -->
+      <div class="pin-keypad">
+        <button type="button" class="pin-key" onclick="pressPin('1')">1</button>
+        <button type="button" class="pin-key" onclick="pressPin('2')">2</button>
+        <button type="button" class="pin-key" onclick="pressPin('3')">3</button>
+        <button type="button" class="pin-key" onclick="pressPin('4')">4</button>
+        <button type="button" class="pin-key" onclick="pressPin('5')">5</button>
+        <button type="button" class="pin-key" onclick="pressPin('6')">6</button>
+        <button type="button" class="pin-key" onclick="pressPin('7')">7</button>
+        <button type="button" class="pin-key" onclick="pressPin('8')">8</button>
+        <button type="button" class="pin-key" onclick="pressPin('9')">9</button>
+        <button type="button" class="pin-key fn" onclick="clearPin()">ลบ</button>
+        <button type="button" class="pin-key" onclick="pressPin('0')">0</button>
+        <button type="button" class="pin-key fn" onclick="backspacePin()">⌫</button>
+      </div>
+      
+      <div style="font-size: 11px; color: var(--pink-dark); margin-top: 6px;">
+        💡 ค่าเริ่มต้น: บอส (1234) | คู่หู (5678)
+      </div>
+    </div>
+
+    <!-- ========================================================
+         MAIN APP HEADER
+         ======================================================== -->
+    <header class="app-header">
+      <div class="brand-box" onclick="switchView('record')">
+        <img src="https://i.postimg.cc/Kc6BXB17/NB.png" alt="NB" class="brand-logo-img">
+        <span class="brand-title">NB</span>
+      </div>
+
+      <!-- Header Debt Badge -->
+      <div id="hdr-debt-badge" class="header-debt-badge" onclick="switchView('balance')">
         ⚖️ เสมอกัน ฿0
       </div>
 
-      <!-- User profile & PIN switcher -->
-      <div id="active-user-badge" class="user-pill" onclick="openPinModal()">
-        <span id="header-user-avatar">👤</span>
-        <span id="header-user-name">บอส</span>
-        <span style="font-size: 10px; opacity: 0.6;">🔒</span>
+      <!-- Active User Display & Lock Screen Button -->
+      <div class="user-pill-btn" onclick="lockAppScreen()" title="กดเพื่อล็อกหน้าจอหรือเปลี่ยนผู้ใช้">
+        <span id="hdr-user-avatar">🧑‍🦱</span>
+        <span id="hdr-user-name">บอส</span>
+        <span style="font-size: 11px; opacity: 0.7;">🔒</span>
       </div>
     </header>
 
-    <!-- Main Views Area -->
-    <main class="app-content">
+    <!-- ========================================================
+         MAIN CONTENT AREA
+         ======================================================== -->
+    <main class="app-main">
 
-      <!-- ================= VIEW 1: RECORD & BATCH ADD ================= -->
-      <section id="view-record" class="view-panel active">
-        
-        <!-- Payer Selector Card -->
-        <div class="card" style="padding: 10px 12px;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display:flex; justify-content:space-between;">
-            <span>ใครเป็นคนจ่าย? (แตะเพื่อสลับ)</span>
-            <span id="payer-tag-status" style="color: var(--primary);">👤 บอส จ่าย</span>
-          </div>
-          <div class="payer-toggle-group">
-            <button type="button" id="payer-user-1" class="payer-btn active" onclick="setPayer('user1')">
-              <span id="payer-btn-avatar-1">🧑‍🦱</span>
-              <span id="payer-btn-name-1">บอส</span>
-            </button>
-            <button type="button" id="payer-user-2" class="payer-btn" onclick="setPayer('user2')">
-              <span id="payer-btn-avatar-2">👩‍🦰</span>
-              <span id="payer-btn-name-2">คู่หู</span>
-            </button>
+      <!-- ================= VIEW 1: RECORD & BATCH ================= -->
+      <section id="view-record" class="view-section active">
+
+        <!-- Card: ผู้จ่าย & วันที่/เวลา -->
+        <div class="card-white" style="padding: 10px 12px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display:flex; justify-content:space-between;">
+            <span>ใครจ่าย? (แตะเลือก)</span>
+            <span id="payer-tag" style="color: var(--pink-dark); font-weight: 700;">👤 บอส จ่าย</span>
           </div>
 
-          <!-- Thai Date (dd/mm/yyyy พ.ศ.) & Time Selection -->
+          <div class="payer-toggle">
+            <button type="button" id="payer-btn-u1" class="payer-btn active" onclick="setPayer('user1')">
+              <span id="payer-u1-avatar">🧑‍🦱</span>
+              <span id="payer-u1-name">บอส</span>
+            </button>
+            <button type="button" id="payer-btn-u2" class="payer-btn" onclick="setPayer('user2')">
+              <span id="payer-u2-avatar">👩‍🦰</span>
+              <span id="payer-u2-name">คู่หู</span>
+            </button>
+          </div>
+
+          <!-- Thai Date & Time Overlay -->
           <div class="datetime-bar">
-            <!-- Date input with transparent overlay -->
-            <div class="dt-input-wrap" title="คลิกเพื่อเลือกวันที่">
+            <div class="dt-wrap" title="คลิกเพื่อเลือกวันที่">
               <span class="icon">📅</span>
-              <input type="text" id="date-display" class="dt-display" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()">
+              <input type="text" id="date-display" class="dt-text" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()">
               <input type="date" id="date-raw" class="dt-raw" onchange="onDateChange(this.value)">
             </div>
-            <!-- Time input -->
-            <div class="dt-input-wrap" style="max-width: 120px;" title="เวลาทำรายการ">
+            <div class="dt-wrap" style="max-width: 115px;" title="เวลาทำรายการ">
               <span class="icon">⏰</span>
-              <input type="time" id="time-input" class="dt-display" style="text-align:center;">
+              <input type="time" id="time-input" class="dt-text">
             </div>
           </div>
         </div>
 
-        <!-- Expense Entry Form Card -->
-        <div class="card">
-          <!-- Icon Category Selector -->
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
-            หมวดหมู่ (แตะเลือกไอคอน)
-          </div>
-          <div class="category-grid" id="category-selector">
-            <div class="cat-btn selected" onclick="selectCategory(this, '🍛', 'อาหาร')">
-              <span class="icon">🍛</span>
-              <span class="label">อาหาร</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🧋', 'เครื่องดื่ม')">
-              <span class="icon">🧋</span>
-              <span class="label">เครื่องดื่ม</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🛒', 'ของใช้')">
-              <span class="icon">🛒</span>
-              <span class="label">ของใช้</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🚗', 'เดินทาง')">
-              <span class="icon">🚗</span>
-              <span class="label">เดินทาง</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🏠', 'ค่าห้อง/บิล')">
-              <span class="icon">🏠</span>
-              <span class="label">ค่าห้อง/บิล</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🎬', 'บันเทิง')">
-              <span class="icon">🎬</span>
-              <span class="label">บันเทิง</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '💊', 'สุขภาพ')">
-              <span class="icon">💊</span>
-              <span class="label">สุขภาพ</span>
-            </div>
-            <div class="cat-btn" onclick="selectCategory(this, '🏷️', 'อื่นๆ')">
-              <span class="icon">🏷️</span>
-              <span class="label">อื่นๆ</span>
+        <!-- Card: กรอกข้อมูลรายการ -->
+        <div class="card-pink" style="display:flex; flex-direction:column; gap:8px;">
+          
+          <!-- Category Picker Trigger Button (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">หมวดหมู่</div>
+            <div class="cat-popup-trigger" onclick="openCategoryModal()">
+              <div class="cat-current-info">
+                <span id="cat-disp-icon" class="icon">🍛</span>
+                <span id="cat-disp-name">อาหาร</span>
+              </div>
+              <div class="cat-change-tag">แตะเพื่อเปลี่ยน ▾</div>
             </div>
           </div>
 
-          <!-- Amount Input -->
-          <div class="amount-box" style="margin-top: 8px;">
-            <div class="amount-field-wrap">
-              <span class="currency-symbol">฿</span>
-              <input type="number" id="input-amount" class="amount-input" placeholder="0" inputmode="decimal">
-            </div>
-            <div class="quick-chips">
-              <button type="button" class="chip" onclick="addAmount(50)">+50</button>
-              <button type="button" class="chip" onclick="addAmount(100)">+100</button>
-              <button type="button" class="chip" onclick="addAmount(300)">+300</button>
-              <button type="button" class="chip" onclick="addAmount(500)">+500</button>
-              <button type="button" class="chip" onclick="clearAmount()" style="color:var(--danger);">ล้าง</button>
+          <!-- Amount Input (เอาปุ่มแนะนำยอดออกแล้ว) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">จำนวนเงิน (บาท)</div>
+            <div class="amount-input-box">
+              <span class="amount-symbol">฿</span>
+              <input type="number" id="in-amount" class="amount-input-ctrl" placeholder="0" inputmode="decimal">
             </div>
           </div>
 
-          <!-- Split Mode Selection -->
-          <div style="margin-top: 8px;">
-            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
-              วิธีหารเงิน
-            </div>
-            <div class="split-options">
-              <button type="button" class="split-btn active" id="split-half" onclick="setSplitMode('half')">
+          <!-- Split Option (วิธีหาร) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">วิธีหารเงิน</div>
+            <div class="split-row">
+              <button type="button" id="split-half" class="split-btn active" onclick="setSplitMode('half')">
                 <span>🤝</span> <span>คนละครึ่ง (50:50)</span>
               </button>
-              <button type="button" class="split-btn" id="split-full" onclick="setSplitMode('full')">
+              <button type="button" id="split-full" class="split-btn" onclick="setSplitMode('full')">
                 <span>🎁</span> <span>จ่ายให้ 100%</span>
               </button>
             </div>
           </div>
 
-          <!-- Note (optional) -->
-          <div style="margin-top: 8px;">
-            <input type="text" id="input-note" class="note-input" placeholder="โน้ตสั้นๆ เช่น ข้าวกลางวัน, กาแฟอเมซอน...">
+          <!-- Note Input (ช่องพิมพ์หมายเหตุ) -->
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">หมายเหตุ / รายละเอียด</div>
+            <input type="text" id="in-note" class="note-input-ctrl" placeholder="พิมพ์โน้ต เช่น ข้าวกลางวัน, กาแฟ 2 แก้ว...">
           </div>
 
-          <!-- Add to batch button -->
-          <button type="button" class="btn-add-item" onclick="addItemToBatch()" style="margin-top: 10px;">
+          <!-- Button: เพิ่มเข้ารายการ -->
+          <button type="button" class="btn-add-batch" onclick="addItemToBatch()">
             <span>➕</span> <span>เพิ่มเข้ารายการ</span>
           </button>
         </div>
 
-        <!-- BATCH QUEUE SECTION (สามารถเพิ่มหลายรายการก่อนกดส่งข้อมูล) -->
+        <!-- Card: ตะกร้ารายการรอส่ง (Batch Queue) -->
         <div class="batch-card" id="batch-container">
-          <div class="batch-header">
+          <div class="batch-head">
             <span>📦 รายการรอส่ง (<span id="batch-count">0</span> รายการ)</span>
-            <span id="batch-total" style="color: var(--primary); font-size: 13px;">รวม ฿0</span>
+            <span id="batch-total-txt" style="color: var(--pink-dark); font-weight:700;">รวม ฿0</span>
           </div>
 
-          <div class="batch-list" id="batch-items-list">
-            <div id="batch-empty-notice" style="text-align: center; color: #94A3B8; font-size: 11.5px; padding: 10px 0;">
-              ยังไม่มีรายการในชุดนี้ กด "เพิ่มเข้ารายการ" ด้านบน
+          <div class="batch-list" id="batch-list-box">
+            <div id="batch-empty-hint" style="text-align: center; color: #A098A8; font-size: 11.5px; padding: 6px 0;">
+              ยังไม่มีรายการ กด "เพิ่มเข้ารายการ" ด้านบน
             </div>
           </div>
 
-          <!-- Submit All Button -->
-          <button type="button" id="btn-submit-all" class="btn-submit-batch" onclick="submitBatch()" disabled>
+          <!-- Submit All (เมื่อกดแล้วเคลียร์ช่องออกเลย) -->
+          <button type="button" id="btn-submit-batch" class="btn-submit-all" onclick="submitBatch()" disabled>
             <span>🚀</span> <span>บันทึกข้อมูลทั้งหมด</span>
           </button>
         </div>
 
+        <!-- Section: รายการล่าสุด พร้อมไอคอนลบ -->
+        <div class="recent-section">
+          <div class="recent-header">
+            <span>🕒 รายการล่าสุด</span>
+            <span style="font-size: 10.5px; color: var(--text-muted);">แตะ 🗑️ เพื่อลบรายการ</span>
+          </div>
+          <div id="recent-list-container" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Render dynamically -->
+          </div>
+        </div>
+
       </section>
 
-      <!-- ================= VIEW 2: BALANCE & SETTLEMENT ================= -->
-      <section id="view-balance" class="view-panel">
+      <!-- ================= VIEW 2: BALANCE & SETTLE ================= -->
+      <section id="view-balance" class="view-section">
         
-        <!-- Live Debt Hero Card -->
+        <!-- Settle Hero Card -->
         <div class="balance-hero">
-          <div class="balance-subtitle">สถานะหนี้ปัจจุบัน</div>
-          <div class="balance-amount" id="settle-hero-amt">฿0</div>
-          <div class="balance-desc" id="settle-hero-desc">เคลียร์หมดแล้ว ไม่มีใครติดค้าง 🎉</div>
+          <div class="balance-title">ยอดหนี้สุทธิที่ต้องเคลียร์</div>
+          <div class="balance-amount" id="hero-debt-amt">฿0</div>
+          <div class="balance-desc" id="hero-debt-desc">เคลียร์ครบแล้ว ไม่มีใครติดค้าง 🎉</div>
         </div>
 
-        <!-- Comparison Cards: User 1 vs User 2 -->
-        <div class="debt-vs-box">
-          <div class="user-stat-card">
-            <div class="avatar" id="stat-u1-avatar">🧑‍🦱</div>
-            <div class="name" id="stat-u1-name">บอส</div>
-            <div class="paid-amt" id="stat-u1-paid">฿0</div>
-            <div class="paid-label">ยอดที่จ่ายสะสม</div>
+        <!-- Paid Stats Comparison -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="card-white" style="text-align: center;">
+            <div style="font-size: 26px;" id="stat-u1-avatar">🧑‍🦱</div>
+            <div style="font-size: 13px; font-weight:700;" id="stat-u1-name">บอส</div>
+            <div style="font-size: 16px; font-weight:700; color:var(--pink-dark); margin-top:2px;" id="stat-u1-amt">฿0</div>
+            <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
           </div>
-          <div class="user-stat-card">
-            <div class="avatar" id="stat-u2-avatar">👩‍🦰</div>
-            <div class="name" id="stat-u2-name">คู่หู</div>
-            <div class="paid-amt" id="stat-u2-paid">฿0</div>
-            <div class="paid-label">ยอดที่จ่ายสะสม</div>
+          <div class="card-white" style="text-align: center;">
+            <div style="font-size: 26px;" id="stat-u2-avatar">👩‍🦰</div>
+            <div style="font-size: 13px; font-weight:700;" id="stat-u2-name">คู่หู</div>
+            <div style="font-size: 16px; font-weight:700; color:var(--pink-dark); margin-top:2px;" id="stat-u2-amt">฿0</div>
+            <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
           </div>
         </div>
 
-        <!-- Settle Up Action Button -->
-        <button type="button" class="btn-settle-action" onclick="openSettleModal()">
+        <!-- Button: เคลียร์หนี้ -->
+        <button type="button" class="btn-add-batch" onclick="openSettleModal()" style="padding: 13px; font-size: 15px;">
           <span>💸</span> <span>เคลียร์หนี้ / ชำระเงินคืน</span>
         </button>
 
-        <!-- Settle Tips / PromptPay Info -->
-        <div class="card" style="font-size: 12px; color: var(--text-muted); display:flex; gap:10px; align-items:center;">
-          <span style="font-size: 24px;">💡</span>
-          <div>
-            เมื่อโอนเงินคืนกันแล้ว กดปุ่ม <b>"เคลียร์หนี้"</b> เพื่อปรับยอดติดค้างให้เป็น 0 และบันทึกประวัติการคืนเงินทันที
-          </div>
+        <div class="card-white" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted);">
+          <span style="font-size: 22px;">💡</span>
+          <div>เมื่อโอนเงินคืนกันแล้ว กดปุ่ม <b>"เคลียร์หนี้"</b> เพื่อบันทึกประวัติและปรับยอดหนี้กลับเป็น 0 ทันที</div>
         </div>
 
       </section>
 
-      <!-- ================= VIEW 3: TRANSACTION HISTORY ================= -->
-      <section id="view-history" class="view-panel">
-        
+      <!-- ================= VIEW 3: HISTORY ================= -->
+      <section id="view-history" class="view-section">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="font-size: 14px; font-weight: 700;">📋 ประวัติการทำรายการ</div>
-          <button type="button" onclick="clearAllHistoryPrompt()" style="background:transparent; border:none; font-size:11px; color:#A0AEC0; cursor:pointer;">
+          <span style="font-size: 14px; font-weight:700; color:var(--pink-dark);">📋 ประวัติรายการทั้งหมด</span>
+          <button type="button" onclick="confirmClearHistory()" style="background:transparent; border:none; font-size:11px; color:#A098A8; cursor:pointer;">
             ล้างประวัติ
           </button>
         </div>
 
-        <!-- History Items Container -->
-        <div id="history-list-container" style="display: flex; flex-direction: column; gap: 8px;">
-          <!-- Items will be injected dynamically -->
+        <div id="full-history-container" style="display:flex; flex-direction:column; gap:7px;">
+          <!-- Items -->
         </div>
-
       </section>
 
-      <!-- ================= VIEW 4: SETTINGS & PIN SETUP ================= -->
-      <section id="view-settings" class="view-panel">
+      <!-- ================= VIEW 4: SETTINGS & GAS ================= -->
+      <section id="view-settings" class="view-section">
         
-        <div class="card">
-          <div style="font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--secondary);">
+        <!-- User Names & PINs Setup -->
+        <div class="card-white">
+          <div style="font-size: 13px; font-weight: 700; color: var(--pink-dark); margin-bottom: 8px;">
             ⚙️ ข้อมูลผู้ใช้งาน & รหัส PIN
           </div>
 
-          <!-- User 1 Config -->
-          <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--border);">
+          <!-- User 1 -->
+          <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--pink-border);">
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">ผู้ใช้งาน 1 (User 1)</div>
             <div style="display:flex; gap: 8px;">
-              <input type="text" id="cfg-u1-avatar" class="note-input" style="max-width: 50px; text-align: center; font-size:16px;" value="🧑‍🦱">
-              <input type="text" id="cfg-u1-name" class="note-input" placeholder="ชื่อเล่น" value="บอส">
-              <input type="password" id="cfg-u1-pin" class="note-input" placeholder="PIN 4 หลัก" maxlength="4" style="max-width: 90px; text-align: center;" value="1234">
+              <input type="text" id="cfg-u1-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="🧑‍🦱">
+              <input type="text" id="cfg-u1-name" class="note-input-ctrl" placeholder="ชื่อเล่น" value="บอส">
+              <input type="password" id="cfg-u1-pin" class="note-input-ctrl" placeholder="PIN" maxlength="4" style="max-width: 80px; text-align: center;" value="1234">
             </div>
           </div>
 
-          <!-- User 2 Config -->
+          <!-- User 2 -->
           <div>
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">ผู้ใช้งาน 2 (User 2)</div>
             <div style="display:flex; gap: 8px;">
-              <input type="text" id="cfg-u2-avatar" class="note-input" style="max-width: 50px; text-align: center; font-size:16px;" value="👩‍🦰">
-              <input type="text" id="cfg-u2-name" class="note-input" placeholder="ชื่อเล่น" value="คู่หู">
-              <input type="password" id="cfg-u2-pin" class="note-input" placeholder="PIN 4 หลัก" maxlength="4" style="max-width: 90px; text-align: center;" value="5678">
+              <input type="text" id="cfg-u2-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="👩‍🦰">
+              <input type="text" id="cfg-u2-name" class="note-input-ctrl" placeholder="ชื่อเล่น" value="คู่หู">
+              <input type="password" id="cfg-u2-pin" class="note-input-ctrl" placeholder="PIN" maxlength="4" style="max-width: 80px; text-align: center;" value="5678">
             </div>
           </div>
 
-          <button type="button" class="btn-add-item" onclick="saveUserSettings()" style="margin-top: 14px; background: var(--secondary); box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);">
-            <span>💾</span> <span>บันทึกการตั้งค่า PIN</span>
+          <button type="button" class="btn-add-batch" onclick="saveUserSettings()" style="margin-top: 10px; padding: 8px;">
+            <span>💾</span> <span>บันทึกข้อมูลและรหัส PIN</span>
           </button>
         </div>
 
-        <!-- Cloud Sync / Google Sheet Backend -->
-        <div class="card">
-          <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--accent);">
-            ☁️ ซิงค์ข้อมูลข้ามเครื่อง (Google Sheets API)
+        <!-- Google Sheet Integration -->
+        <div class="card-white">
+          <div style="font-size: 13px; font-weight: 700; color: #20BF6B; margin-bottom: 4px;">
+            📊 เชื่อมต่อ Google Sheets (Cloud Sync)
           </div>
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-            ใส่ Google Apps Script Web App URL เพื่อให้ทั้ง 2 คนแชร์ยอดเงินกันได้แบบ Realtime ข้ามมือถือ
+            ใส่ Google Apps Script Web App URL เพื่อบันทึกข้อมูลลง Google Sheet และแชร์ข้อมูลร่วมกัน 2 เครื่อง
           </div>
-          <input type="url" id="cfg-gas-url" class="note-input" placeholder="https://script.google.com/macros/s/.../exec">
-          <button type="button" class="btn-add-item" onclick="saveCloudUrl()" style="margin-top: 8px; background: #20BF6B; box-shadow: none; font-size: 12.5px; padding: 8px;">
-            <span>🔗</span> <span>เชื่อมต่อ Google Sheets</span>
-          </button>
+          <input type="url" id="cfg-gas-url" class="note-input-ctrl" placeholder="https://script.google.com/macros/s/.../exec">
+          
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="button" class="btn-add-batch" onclick="saveGasUrl()" style="background:#20BF6B; padding:8px; flex:1;">
+              <span>🔗</span> <span>บันทึก URL</span>
+            </button>
+            <button type="button" class="btn-add-batch" onclick="fetchFromGas()" style="background:#0984E3; padding:8px; flex:1;">
+              <span>🔄</span> <span>ดึงข้อมูลล่าสุด</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Logout / Relock -->
+        <button type="button" class="btn-add-batch" onclick="lockAppScreen()" style="background:#7A7585;">
+          <span>🔒</span> <span>ล็อกหน้าจอ (กลับหน้า PIN)</span>
+        </button>
 
       </section>
 
     </main>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-      <button type="button" class="nav-btn active" id="nav-record" onclick="switchView('record')">
+    <!-- ========================================================
+         BOTTOM NAVIGATION BAR
+         ======================================================== -->
+    <nav class="app-nav">
+      <button type="button" id="nav-record" class="nav-item active" onclick="switchView('record')">
         <span class="icon">➕</span>
         <span class="label">บันทึก</span>
       </button>
-      <button type="button" class="nav-btn" id="nav-balance" onclick="switchView('balance')">
+      <button type="button" id="nav-balance" class="nav-item" onclick="switchView('balance')">
         <span class="icon">⚖️</span>
         <span class="label">เคลียร์หนี้</span>
       </button>
-      <button type="button" class="nav-btn" id="nav-history" onclick="switchView('history')">
+      <button type="button" id="nav-history" class="nav-item" onclick="switchView('history')">
         <span class="icon">📋</span>
         <span class="label">ประวัติ</span>
       </button>
-      <button type="button" class="nav-btn" id="nav-settings" onclick="switchView('settings')">
+      <button type="button" id="nav-settings" class="nav-item" onclick="switchView('settings')">
         <span class="icon">⚙️</span>
         <span class="label">ตั้งค่า</span>
       </button>
     </nav>
 
-    <!-- ================= MODAL: PIN PAD AUTH ================= -->
-    <div id="modal-pin" class="modal-overlay">
+    <!-- ========================================================
+         MODAL: หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ
+         ======================================================== -->
+    <div id="modal-category" class="modal-backdrop">
       <div class="bottom-sheet">
-        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-          <span style="font-size: 14px; font-weight: 700;">🔒 ยืนยันตัวตนด้วย PIN</span>
-          <button type="button" onclick="closePinModal()" style="border:none; background:transparent; font-size:18px; color:#A0AEC0; cursor:pointer;">✕</button>
+        <div class="modal-head">
+          <span>✨ เลือกหมวดหมู่</span>
+          <button type="button" class="modal-close-btn" onclick="closeCategoryModal()">✕</button>
         </div>
-        
-        <div style="font-size: 12px; color: var(--text-muted);">
-          แตะเลือกผู้ใช้และใส่รหัส PIN 4 หลัก
-        </div>
-
-        <!-- Target user toggle inside PIN pad -->
-        <div class="payer-toggle-group" style="width: 100%;">
-          <button type="button" id="pin-target-u1" class="payer-btn active" onclick="setPinTarget('user1')">
-            <span id="pin-u1-avatar">🧑‍🦱</span>
-            <span id="pin-u1-name">บอส</span>
-          </button>
-          <button type="button" id="pin-target-u2" class="payer-btn" onclick="setPinTarget('user2')">
-            <span id="pin-u2-avatar">👩‍🦰</span>
-            <span id="pin-u2-name">คู่หู</span>
-          </button>
-        </div>
-
-        <!-- 4 PIN Dots -->
-        <div class="pin-dots">
-          <div class="dot" id="dot-0"></div>
-          <div class="dot" id="dot-1"></div>
-          <div class="dot" id="dot-2"></div>
-          <div class="dot" id="dot-3"></div>
-        </div>
-
-        <!-- Numpad -->
-        <div class="pin-numpad">
-          <button type="button" class="num-btn" onclick="pressPin('1')">1</button>
-          <button type="button" class="num-btn" onclick="pressPin('2')">2</button>
-          <button type="button" class="num-btn" onclick="pressPin('3')">3</button>
-          <button type="button" class="num-btn" onclick="pressPin('4')">4</button>
-          <button type="button" class="num-btn" onclick="pressPin('5')">5</button>
-          <button type="button" class="num-btn" onclick="pressPin('6')">6</button>
-          <button type="button" class="num-btn" onclick="pressPin('7')">7</button>
-          <button type="button" class="num-btn" onclick="pressPin('8')">8</button>
-          <button type="button" class="num-btn" onclick="pressPin('9')">9</button>
-          <button type="button" class="num-btn fn" onclick="clearPin()">ลบทั้งหมด</button>
-          <button type="button" class="num-btn" onclick="pressPin('0')">0</button>
-          <button type="button" class="num-btn fn" onclick="backspacePin()">⌫</button>
+        <div class="cat-modal-grid">
+          <div class="cat-select-cell" onclick="chooseCategory('🍛', 'อาหาร')">
+            <span class="icon">🍛</span>
+            <span class="name">อาหาร</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🧋', 'เครื่องดื่ม')">
+            <span class="icon">🧋</span>
+            <span class="name">เครื่องดื่ม</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🛒', 'ของใช้')">
+            <span class="icon">🛒</span>
+            <span class="name">ของใช้</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🚗', 'เดินทาง')">
+            <span class="icon">🚗</span>
+            <span class="name">เดินทาง</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🏠', 'ค่าห้อง/บิล')">
+            <span class="icon">🏠</span>
+            <span class="name">ค่าห้อง/บิล</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🎬', 'บันเทิง')">
+            <span class="icon">🎬</span>
+            <span class="name">บันเทิง</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('💊', 'สุขภาพ')">
+            <span class="icon">💊</span>
+            <span class="name">สุขภาพ</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🎁', 'ของขวัญ')">
+            <span class="icon">🎁</span>
+            <span class="name">ของขวัญ</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🐾', 'สัตว์เลี้ยง')">
+            <span class="icon">🐾</span>
+            <span class="name">สัตว์เลี้ยง</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('💄', 'ส่วนตัว')">
+            <span class="icon">💄</span>
+            <span class="name">ส่วนตัว</span>
+          </div>
+          <div class="cat-select-cell" onclick="chooseCategory('🏷️', 'อื่นๆ')">
+            <span class="icon">🏷️</span>
+            <span class="name">อื่นๆ</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ================= MODAL: SETTLE DEBT CONFIRMATION ================= -->
-    <div id="modal-settle" class="modal-overlay">
+    <!-- ========================================================
+         MODAL: SETTLE CONFIRMATION
+         ======================================================== -->
+    <div id="modal-settle" class="modal-backdrop">
       <div class="bottom-sheet">
-        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-          <span style="font-size: 15px; font-weight: 700; color: var(--accent);">💸 บันทึกการเคลียร์หนี้</span>
-          <button type="button" onclick="closeSettleModal()" style="border:none; background:transparent; font-size:18px; color:#A0AEC0; cursor:pointer;">✕</button>
+        <div class="modal-head">
+          <span style="color:var(--accent-mint);">💸 บันทึกการเคลียร์หนี้</span>
+          <button type="button" class="modal-close-btn" onclick="closeSettleModal()">✕</button>
         </div>
 
-        <div style="text-align: center; margin: 6px 0;">
-          <div style="font-size: 12px; color: var(--text-muted);">ยอดที่ต้องชำระเพื่อเคลียร์หนี้</div>
-          <div id="modal-settle-amt" style="font-size: 28px; font-weight: 700; color: var(--primary); margin: 4px 0;">฿0</div>
-          <div id="modal-settle-note" style="font-size: 12.5px; color: var(--text);">ผู้โอน -> ผู้รับ</div>
+        <div style="text-align: center; margin: 4px 0;">
+          <div style="font-size: 11.5px; color: var(--text-muted);">ยอดหนี้ที่ต้องชำระ</div>
+          <div id="modal-settle-amt" style="font-size: 28px; font-weight:700; color:var(--pink-dark); margin:2px 0;">฿0</div>
+          <div id="modal-settle-desc" style="font-size: 12px; color: var(--text-main);">ผู้โอน -> ผู้รับ</div>
         </div>
 
-        <!-- Custom Settle Amount Input -->
-        <div style="width: 100%;">
-          <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">
-            จำนวนเงินที่ชำระจริง (สามารถระบุชำระบางส่วนได้)
+        <div>
+          <div style="font-size: 11px; font-weight:600; color:var(--text-muted); margin-bottom:4px;">
+            จำนวนเงินที่ชำระ (สามารถแก้ไขได้)
           </div>
-          <div class="amount-field-wrap">
-            <span class="currency-symbol">฿</span>
-            <input type="number" id="settle-custom-amt" class="amount-input" inputmode="decimal">
+          <div class="amount-input-box">
+            <span class="amount-symbol">฿</span>
+            <input type="number" id="in-settle-amt" class="amount-input-ctrl" inputmode="decimal">
           </div>
         </div>
 
-        <button type="button" class="btn-submit-batch" onclick="confirmSettle()" style="margin-top: 6px;">
+        <button type="button" class="btn-submit-all" onclick="confirmSettle()" style="margin-top: 6px;">
           <span>✅</span> <span>ยืนยันเคลียร์หนี้เรียบร้อย</span>
         </button>
       </div>
@@ -1113,14 +1225,14 @@
 
   </div>
 
+  <!-- ========================================================
+       JAVASCRIPT LOGIC
+       ======================================================== -->
   <script>
-    /* ========================================================
-       STATE MANAGEMENT & LOCAL STORAGE
-       ======================================================== */
-    const STORAGE_KEY_CONFIG = 'duopay_config_v1';
-    const STORAGE_KEY_ITEMS = 'duopay_items_v1';
+    const STORAGE_KEY_CFG = 'nb_app_config_v2';
+    const STORAGE_KEY_ITEMS = 'nb_app_items_v2';
 
-    // Default Configuration
+    // Default configuration
     let appConfig = {
       user1: { name: 'บอส', avatar: '🧑‍🦱', pin: '1234' },
       user2: { name: 'คู่หู', avatar: '👩‍🦰', pin: '5678' },
@@ -1128,26 +1240,24 @@
       gasUrl: ''
     };
 
-    // Current State
+    let enteredPin = '';
     let currentPayerKey = 'user1';
-    let currentSelectedCategory = { icon: '🍛', name: 'อาหาร' };
-    let currentSplitMode = 'half'; // 'half' | 'full'
+    let currentCategory = { icon: '🍛', name: 'อาหาร' };
+    let currentSplitMode = 'half';
     let batchQueue = [];
     let transactions = [];
 
-    // PIN Pad State
-    let pinTargetUserKey = 'user1';
-    let enteredPin = '';
-
-    /* ========================================================
-       INITIALIZATION
-       ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
-      loadStorage();
+      loadLocalStorage();
       initDateTime();
       applyConfigToUI();
-      renderBatchQueue();
+      renderBatch();
       renderAll();
+
+      // Check if GAS URL is already set, if so fetch from Google Sheets
+      if (appConfig.gasUrl) {
+        fetchFromGas(true);
+      }
 
       // Register Service Worker
       if ('serviceWorker' in navigator) {
@@ -1155,42 +1265,32 @@
       }
     });
 
-    function loadStorage() {
+    /* ========================================================
+       LOCAL STORAGE
+       ======================================================== */
+    function loadLocalStorage() {
       try {
-        const savedCfg = localStorage.getItem(STORAGE_KEY_CONFIG);
+        const savedCfg = localStorage.getItem(STORAGE_KEY_CFG);
         if (savedCfg) appConfig = Object.assign(appConfig, JSON.parse(savedCfg));
 
         const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
         if (savedItems) {
           transactions = JSON.parse(savedItems);
         } else {
-          // Sample preloaded transactions for demonstration
+          // Initial demo item
           transactions = [
             {
-              id: 'tx_demo_1',
+              id: 'tx_' + Date.now(),
               dateStr: getTodayThaiDate(),
               timeStr: '12:30',
               payerKey: 'user1',
               catIcon: '🍛',
               catName: 'อาหาร',
-              amount: 240,
+              amount: 150,
               splitMode: 'half',
-              note: 'ส้มตำไก่ย่างมื้อเที่ยง',
+              note: 'ข้าวกะเพราหมูกรอบ',
               type: 'expense',
-              timestamp: Date.now() - 3600000 * 4
-            },
-            {
-              id: 'tx_demo_2',
-              dateStr: getTodayThaiDate(),
-              timeStr: '14:15',
-              payerKey: 'user2',
-              catIcon: '🧋',
-              catName: 'เครื่องดื่ม',
-              amount: 110,
-              splitMode: 'full',
-              note: 'ชานมไข่มุกแจนซื้อให้บอส',
-              type: 'expense',
-              timestamp: Date.now() - 3600000 * 2
+              timestamp: Date.now()
             }
           ];
           saveTransactions();
@@ -1208,8 +1308,89 @@
 
     function saveConfig() {
       try {
-        localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(appConfig));
+        localStorage.setItem(STORAGE_KEY_CFG, JSON.stringify(appConfig));
       } catch (e) {}
+    }
+
+    /* ========================================================
+       PIN LOCK SCREEN (เมื่อกด PIN ของใคร เข้าสู่ระบบของคนนั้น)
+       ======================================================== */
+    function pressPin(digit) {
+      if (enteredPin.length < 4) {
+        enteredPin += digit;
+        updatePinDots();
+
+        if (enteredPin.length === 4) {
+          setTimeout(verifyPinInput, 120);
+        }
+      }
+    }
+
+    function backspacePin() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updatePinDots();
+      }
+    }
+
+    function clearPin() {
+      enteredPin = '';
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < enteredPin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      }
+    }
+
+    function verifyPinInput() {
+      const u1 = appConfig.user1;
+      const u2 = appConfig.user2;
+
+      if (enteredPin === u1.pin) {
+        loginAsUser('user1');
+      } else if (enteredPin === u2.pin) {
+        loginAsUser('user2');
+      } else {
+        showToast('❌ รหัส PIN ไม่ถูกต้อง', '❌');
+        shakePinDots();
+        enteredPin = '';
+        setTimeout(updatePinDots, 200);
+      }
+    }
+
+    function loginAsUser(userKey) {
+      appConfig.activeUserKey = userKey;
+      currentPayerKey = userKey;
+      saveConfig();
+      applyConfigToUI();
+
+      // Hide PIN lock screen
+      document.getElementById('screen-pin-lock').classList.add('hidden');
+      enteredPin = '';
+      updatePinDots();
+
+      const user = appConfig[userKey];
+      showToast(`🌸 ยินดีต้อนรับ คุณ${user.name}`, '👋');
+    }
+
+    function lockAppScreen() {
+      enteredPin = '';
+      updatePinDots();
+      document.getElementById('screen-pin-lock').classList.remove('hidden');
+    }
+
+    function shakePinDots() {
+      const el = document.querySelector('.pin-dots-row');
+      el.style.transform = 'translateX(10px)';
+      setTimeout(() => el.style.transform = 'translateX(-10px)', 80);
+      setTimeout(() => el.style.transform = 'translateX(0)', 160);
     }
 
     /* ========================================================
@@ -1217,19 +1398,16 @@
        ======================================================== */
     function initDateTime() {
       const now = new Date();
-      // Set Raw Date YYYY-MM-DD
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const d = String(now.getDate()).padStart(2, '0');
       const rawEl = document.getElementById('date-raw');
       if (rawEl) rawEl.value = `${y}-${m}-${d}`;
 
-      // Set Thai Display Date dd/mm/yyyy พ.ศ.
       const displayEl = document.getElementById('date-display');
       const yBE = y + 543;
       if (displayEl) displayEl.value = `${d}/${m}/${yBE}`;
 
-      // Set Time HH:mm
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
       const timeEl = document.getElementById('time-input');
@@ -1269,31 +1447,40 @@
     }
 
     /* ========================================================
-       UI & VIEW NAVIGATION
+       VIEW NAVIGATION
        ======================================================== */
     function switchView(viewName) {
-      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
 
-      const targetPanel = document.getElementById(`view-${viewName}`);
+      const targetSection = document.getElementById(`view-${viewName}`);
       const targetNav = document.getElementById(`nav-${viewName}`);
-      if (targetPanel) targetPanel.classList.add('active');
+      if (targetSection) targetSection.classList.add('active');
       if (targetNav) targetNav.classList.add('active');
 
-      if (viewName === 'balance' || viewName === 'history') {
-        renderAll();
-      }
+      renderAll();
     }
 
     function applyConfigToUI() {
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
 
-      // Payer toggle buttons
-      document.getElementById('payer-btn-avatar-1').textContent = u1.avatar;
-      document.getElementById('payer-btn-name-1').textContent = u1.name;
-      document.getElementById('payer-btn-avatar-2').textContent = u2.avatar;
-      document.getElementById('payer-btn-name-2').textContent = u2.name;
+      // Header User Pill
+      const active = appConfig[appConfig.activeUserKey];
+      document.getElementById('hdr-user-avatar').textContent = active.avatar;
+      document.getElementById('hdr-user-name').textContent = active.name;
+
+      // Payer toggle
+      document.getElementById('payer-u1-avatar').textContent = u1.avatar;
+      document.getElementById('payer-u1-name').textContent = u1.name;
+      document.getElementById('payer-u2-avatar').textContent = u2.avatar;
+      document.getElementById('payer-u2-name').textContent = u2.name;
+
+      // Stats
+      document.getElementById('stat-u1-avatar').textContent = u1.avatar;
+      document.getElementById('stat-u1-name').textContent = u1.name;
+      document.getElementById('stat-u2-avatar').textContent = u2.avatar;
+      document.getElementById('stat-u2-name').textContent = u2.name;
 
       // Settings fields
       document.getElementById('cfg-u1-avatar').value = u1.avatar;
@@ -1306,26 +1493,7 @@
 
       document.getElementById('cfg-gas-url').value = appConfig.gasUrl || '';
 
-      // Stat cards
-      document.getElementById('stat-u1-avatar').textContent = u1.avatar;
-      document.getElementById('stat-u1-name').textContent = u1.name;
-      document.getElementById('stat-u2-avatar').textContent = u2.avatar;
-      document.getElementById('stat-u2-name').textContent = u2.name;
-
-      // Pin modal labels
-      document.getElementById('pin-u1-avatar').textContent = u1.avatar;
-      document.getElementById('pin-u1-name').textContent = u1.name;
-      document.getElementById('pin-u2-avatar').textContent = u2.avatar;
-      document.getElementById('pin-u2-name').textContent = u2.name;
-
-      updateActiveUserBadge();
       updatePayerUI();
-    }
-
-    function updateActiveUserBadge() {
-      const activeUser = appConfig[appConfig.activeUserKey];
-      document.getElementById('header-user-avatar').textContent = activeUser.avatar;
-      document.getElementById('header-user-name').textContent = activeUser.name;
     }
 
     function setPayer(key) {
@@ -1334,9 +1502,9 @@
     }
 
     function updatePayerUI() {
-      const u1Btn = document.getElementById('payer-user-1');
-      const u2Btn = document.getElementById('payer-user-2');
-      const tag = document.getElementById('payer-tag-status');
+      const u1Btn = document.getElementById('payer-btn-u1');
+      const u2Btn = document.getElementById('payer-btn-u2');
+      const tag = document.getElementById('payer-tag');
       const active = appConfig[currentPayerKey];
 
       if (currentPayerKey === 'user1') {
@@ -1349,10 +1517,22 @@
       tag.textContent = `${active.avatar} ${active.name} จ่าย`;
     }
 
-    function selectCategory(btnEl, icon, name) {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-      btnEl.classList.add('selected');
-      currentSelectedCategory = { icon, name };
+    /* ========================================================
+       CATEGORY POPUP (หมวดหมู่เป็นปุ่มสำหรับป๊อปอัพ)
+       ======================================================== */
+    function openCategoryModal() {
+      document.getElementById('modal-category').classList.add('active');
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('modal-category').classList.remove('active');
+    }
+
+    function chooseCategory(icon, name) {
+      currentCategory = { icon, name };
+      document.getElementById('cat-disp-icon').textContent = icon;
+      document.getElementById('cat-disp-name').textContent = name;
+      closeCategoryModal();
     }
 
     function setSplitMode(mode) {
@@ -1361,234 +1541,272 @@
       document.getElementById('split-full').classList.toggle('active', mode === 'full');
     }
 
-    function addAmount(val) {
-      const input = document.getElementById('input-amount');
-      const current = parseFloat(input.value) || 0;
-      input.value = current + val;
-    }
-
-    function clearAmount() {
-      document.getElementById('input-amount').value = '';
-    }
-
     /* ========================================================
-       BATCH ADD LOGIC (เพิ่มได้หลายรายการก่อนกดส่ง)
+       BATCH ADD LOGIC (เพิ่มได้หลายรายการ + เคลียร์ช่อง)
        ======================================================== */
     function addItemToBatch() {
-      const amtInput = document.getElementById('input-amount');
+      const amtInput = document.getElementById('in-amount');
       const amount = parseFloat(amtInput.value);
 
       if (!amount || amount <= 0) {
-        showToast('⚠️ กรุณาระบุจำนวนเงิน', '⚠️');
+        showToast('กรุณาระบุจำนวนเงิน', '⚠️');
         amtInput.focus();
         return;
       }
 
+      const noteInput = document.getElementById('in-note');
+      const note = noteInput.value.trim() || currentCategory.name;
       const dateStr = document.getElementById('date-display').value || getTodayThaiDate();
       const timeStr = document.getElementById('time-input').value || '12:00';
-      const note = document.getElementById('input-note').value.trim();
 
-      const item = {
+      const tempItem = {
         tempId: 'batch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         dateStr,
         timeStr,
         payerKey: currentPayerKey,
-        catIcon: currentSelectedCategory.icon,
-        catName: currentSelectedCategory.name,
+        catIcon: currentCategory.icon,
+        catName: currentCategory.name,
         amount,
         splitMode: currentSplitMode,
-        note: note || currentSelectedCategory.name
+        note
       };
 
-      batchQueue.push(item);
+      batchQueue.push(tempItem);
 
-      // Reset amount & note input
+      // เคลียร์ช่องพิมพ์ทันที
       amtInput.value = '';
-      document.getElementById('input-note').value = '';
+      noteInput.value = '';
 
-      renderBatchQueue();
-      showToast(`➕ เพิ่ม "${item.note}" ฿${item.amount} แล้ว`, '✨');
+      renderBatch();
+      showToast(`➕ เพิ่ม "${tempItem.note}" ฿${tempItem.amount}`, '✨');
     }
 
     function removeBatchItem(tempId) {
       batchQueue = batchQueue.filter(i => i.tempId !== tempId);
-      renderBatchQueue();
+      renderBatch();
     }
 
-    function renderBatchQueue() {
-      const listEl = document.getElementById('batch-items-list');
-      const emptyNotice = document.getElementById('batch-empty-notice');
+    function renderBatch() {
+      const listEl = document.getElementById('batch-list-box');
+      const emptyHint = document.getElementById('batch-empty-hint');
       const countEl = document.getElementById('batch-count');
-      const totalEl = document.getElementById('batch-total');
-      const submitBtn = document.getElementById('btn-submit-all');
+      const totalEl = document.getElementById('batch-total-txt');
+      const submitBtn = document.getElementById('btn-submit-batch');
 
       countEl.textContent = batchQueue.length;
       const total = batchQueue.reduce((sum, item) => sum + item.amount, 0);
       totalEl.textContent = `รวม ฿${total.toLocaleString('th-TH')}`;
 
       if (batchQueue.length === 0) {
-        emptyNotice.style.display = 'block';
+        emptyHint.style.display = 'block';
         submitBtn.disabled = true;
-        // Clear old item nodes
-        const items = listEl.querySelectorAll('.batch-item');
-        items.forEach(el => el.remove());
+        const oldItems = listEl.querySelectorAll('.batch-item');
+        oldItems.forEach(el => el.remove());
         return;
       }
 
-      emptyNotice.style.display = 'none';
+      emptyHint.style.display = 'none';
       submitBtn.disabled = false;
 
-      // Render items
       let html = '';
       batchQueue.forEach((it) => {
         const payer = appConfig[it.payerKey];
-        const splitText = it.splitMode === 'half' ? '🤝 หารครึ่ง' : '🎁 จ่ายแทน';
+        const splitLabel = it.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
         html += `
           <div class="batch-item">
             <div class="batch-item-left">
               <span class="batch-item-icon">${it.catIcon}</span>
               <div>
-                <div class="batch-item-title">${escapeHtml(it.note)}</div>
-                <div class="batch-item-tag">${payer.avatar} ${payer.name} จ่าย • ${splitText}</div>
+                <div class="batch-item-text">${escapeHtml(it.note)}</div>
+                <div style="font-size:10px; color:var(--text-muted);">${payer.avatar} ${payer.name} • ${splitLabel}</div>
               </div>
             </div>
             <div class="batch-item-right">
               <span class="batch-item-amt">฿${it.amount.toLocaleString()}</span>
-              <button type="button" class="batch-item-del" onclick="removeBatchItem('${it.tempId}')" title="ลบรายการ">✕</button>
+              <button type="button" class="batch-item-del" onclick="removeBatchItem('${it.tempId}')">✕</button>
             </div>
           </div>
         `;
       });
-
       listEl.innerHTML = html;
     }
 
+    /* เมื่อบันทึกข้อมูลแล้ว ให้เคลียร์ช่องรายการออกเลย */
     function submitBatch() {
       if (batchQueue.length === 0) return;
 
       const now = Date.now();
-      batchQueue.forEach((b, idx) => {
-        transactions.unshift({
-          id: 'tx_' + (now + idx),
-          dateStr: b.dateStr,
-          timeStr: b.timeStr,
-          payerKey: b.payerKey,
-          catIcon: b.catIcon,
-          catName: b.catName,
-          amount: b.amount,
-          splitMode: b.splitMode,
-          note: b.note,
-          type: 'expense',
-          timestamp: now + idx
-        });
-      });
+      const newItems = batchQueue.map((b, idx) => ({
+        id: 'tx_' + (now + idx),
+        dateStr: b.dateStr,
+        timeStr: b.timeStr,
+        payerKey: b.payerKey,
+        catIcon: b.catIcon,
+        catName: b.catName,
+        amount: b.amount,
+        splitMode: b.splitMode,
+        note: b.note,
+        type: 'expense',
+        timestamp: now + idx
+      }));
+
+      // Prepend to transactions
+      transactions = [...newItems, ...transactions];
+      saveTransactions();
 
       const count = batchQueue.length;
+
+      // เคลียร์ตะกร้าและช่องกรอกทั้งหมด
       batchQueue = [];
-      saveTransactions();
-      renderBatchQueue();
+      document.getElementById('in-amount').value = '';
+      document.getElementById('in-note').value = '';
+      chooseCategory('🍛', 'อาหาร');
+
+      renderBatch();
       renderAll();
 
       showToast(`🎉 บันทึกสำเร็จ ${count} รายการ!`, '🚀');
 
-      // Sync to cloud if configured
-      syncToCloud();
+      // Sync with Google Sheets
+      if (appConfig.gasUrl) {
+        sendBatchToGas(newItems);
+      }
     }
 
     /* ========================================================
-       DEBT CALCULATION & SETTLEMENT ENGINE
+       DEBT & SUMMARY ENGINE
        ======================================================== */
     function calculateDebt() {
-      let u1PaidTotal = 0;
-      let u2PaidTotal = 0;
-      let netDebt = 0; // Positive: User 2 owes User 1 | Negative: User 1 owes User 2
+      let u1Paid = 0;
+      let u2Paid = 0;
+      let netDebt = 0; // >0: u2 owes u1; <0: u1 owes u2
 
       transactions.forEach(tx => {
         if (tx.type === 'expense') {
           if (tx.payerKey === 'user1') {
-            u1PaidTotal += tx.amount;
-            if (tx.splitMode === 'half') {
-              netDebt += (tx.amount / 2);
-            } else if (tx.splitMode === 'full') {
-              netDebt += tx.amount;
-            }
+            u1Paid += tx.amount;
+            if (tx.splitMode === 'half') netDebt += (tx.amount / 2);
+            else if (tx.splitMode === 'full') netDebt += tx.amount;
           } else if (tx.payerKey === 'user2') {
-            u2PaidTotal += tx.amount;
-            if (tx.splitMode === 'half') {
-              netDebt -= (tx.amount / 2);
-            } else if (tx.splitMode === 'full') {
-              netDebt -= tx.amount;
-            }
+            u2Paid += tx.amount;
+            if (tx.splitMode === 'half') netDebt -= (tx.amount / 2);
+            else if (tx.splitMode === 'full') netDebt -= tx.amount;
           }
         } else if (tx.type === 'settle') {
-          // A settlement transaction: who paid whom
-          if (tx.settlerKey === 'user2') {
-            // User 2 paid User 1
-            netDebt -= tx.amount;
-          } else if (tx.settlerKey === 'user1') {
-            // User 1 paid User 2
-            netDebt += tx.amount;
-          }
+          if (tx.settlerKey === 'user2') netDebt -= tx.amount;
+          else if (tx.settlerKey === 'user1') netDebt += tx.amount;
         }
       });
 
-      return {
-        u1PaidTotal,
-        u2PaidTotal,
-        netDebt // if > 0: user2 owes user1; if < 0: user1 owes user2; if == 0: settled
-      };
+      return { u1Paid, u2Paid, netDebt };
     }
 
     function renderAll() {
-      const { u1PaidTotal, u2PaidTotal, netDebt } = calculateDebt();
+      const { u1Paid, u2Paid, netDebt } = calculateDebt();
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
 
-      // Update stat cards
-      document.getElementById('stat-u1-paid').textContent = `฿${u1PaidTotal.toLocaleString()}`;
-      document.getElementById('stat-u2-paid').textContent = `฿${u2PaidTotal.toLocaleString()}`;
+      document.getElementById('stat-u1-amt').textContent = `฿${u1Paid.toLocaleString()}`;
+      document.getElementById('stat-u2-amt').textContent = `฿${u2Paid.toLocaleString()}`;
 
-      // Update header badge and settle hero card
-      const headerBadge = document.getElementById('header-debt-badge');
-      const heroAmt = document.getElementById('settle-hero-amt');
-      const heroDesc = document.getElementById('settle-hero-desc');
+      const hdrBadge = document.getElementById('hdr-debt-badge');
+      const heroAmt = document.getElementById('hero-debt-amt');
+      const heroDesc = document.getElementById('hero-debt-desc');
 
       const absDebt = Math.abs(netDebt);
-      const roundedDebt = Math.round(absDebt * 100) / 100;
+      const rounded = Math.round(absDebt * 100) / 100;
 
-      if (roundedDebt <= 0.01) {
-        headerBadge.textContent = '⚖️ เสมอกัน ฿0';
-        headerBadge.style.background = '#E2E8F0';
-        headerBadge.style.color = '#4A5568';
+      if (rounded <= 0.01) {
+        hdrBadge.textContent = '⚖️ เสมอกัน ฿0';
+        hdrBadge.style.background = '#FFE5EC';
+        hdrBadge.style.color = '#E05370';
 
         heroAmt.textContent = '฿0';
-        heroDesc.textContent = 'เคลียร์หมดแล้ว ไม่มีใครติดค้าง 🎉';
+        heroDesc.textContent = 'เคลียร์ครบแล้ว ไม่มีใครติดค้าง 🎉';
       } else if (netDebt > 0) {
-        // user2 owes user1
-        headerBadge.textContent = `${u2.avatar} โอนให้ ${u1.avatar} ฿${roundedDebt.toLocaleString()}`;
-        headerBadge.style.background = '#FFE5EC';
-        headerBadge.style.color = '#E03E60';
+        // u2 owes u1
+        hdrBadge.textContent = `${u2.avatar} โอนให้ ${u1.avatar} ฿${rounded.toLocaleString()}`;
+        hdrBadge.style.background = '#FFE5EC';
+        hdrBadge.style.color = '#E05370';
 
-        heroAmt.textContent = `฿${roundedDebt.toLocaleString()}`;
+        heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u2.avatar} ${u2.name} ต้องโอนให้ ${u1.avatar} ${u1.name}`;
       } else {
-        // user1 owes user2
-        headerBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${roundedDebt.toLocaleString()}`;
-        headerBadge.style.background = '#EDE9FE';
-        headerBadge.style.color = '#6C5CE7';
+        // u1 owes u2
+        hdrBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${rounded.toLocaleString()}`;
+        hdrBadge.style.background = '#FFE5EC';
+        hdrBadge.style.color = '#E05370';
 
-        heroAmt.textContent = `฿${roundedDebt.toLocaleString()}`;
+        heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u1.avatar} ${u1.name} ต้องโอนให้ ${u2.avatar} ${u2.name}`;
       }
 
-      renderHistoryList();
+      renderRecentList();
+      renderFullHistory();
     }
 
-    function renderHistoryList() {
-      const container = document.getElementById('history-list-container');
+    /* รายการล่าสุด พร้อมไอคอนลบ */
+    function renderRecentList() {
+      const container = document.getElementById('recent-list-container');
+      const recent = transactions.slice(0, 4); // 4 รายการล่าสุด
+
+      if (recent.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: #A098A8; font-size: 11px; padding: 8px 0;">
+            ยังไม่มีรายการ
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      recent.forEach(tx => {
+        if (tx.type === 'settle') {
+          const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+          const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+          html += `
+            <div class="recent-row" style="background:#F0FDF4;">
+              <div class="recent-left">
+                <span class="recent-icon">🤝</span>
+                <div>
+                  <div class="recent-note" style="color:#16A34A;">เคลียร์หนี้เรียบร้อย</div>
+                  <div class="recent-sub">${tx.dateStr} • ${settler.name} โอนให้ ${receiver.name}</div>
+                </div>
+              </div>
+              <div class="recent-right">
+                <span class="recent-amt" style="color:#16A34A;">฿${tx.amount.toLocaleString()}</span>
+                <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')" title="ลบรายการ">🗑️</button>
+              </div>
+            </div>
+          `;
+        } else {
+          const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
+          const splitLabel = tx.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
+          html += `
+            <div class="recent-row">
+              <div class="recent-left">
+                <span class="recent-icon">${tx.catIcon || '💳'}</span>
+                <div>
+                  <div class="recent-note">${escapeHtml(tx.note || tx.catName)}</div>
+                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${payer.name} (${splitLabel})</div>
+                </div>
+              </div>
+              <div class="recent-right">
+                <span class="recent-amt">฿${tx.amount.toLocaleString()}</span>
+                <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')" title="ลบรายการ">🗑️</button>
+              </div>
+            </div>
+          `;
+        }
+      });
+      container.innerHTML = html;
+    }
+
+    function renderFullHistory() {
+      const container = document.getElementById('full-history-container');
       if (transactions.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; color: #94A3B8; padding: 30px 0; font-size: 13px;">
+          <div style="text-align: center; color: #A098A8; font-size: 12px; padding: 25px 0;">
             ยังไม่มีประวัติการทำรายการ
           </div>
         `;
@@ -1598,54 +1816,69 @@
       let html = '';
       transactions.forEach(tx => {
         if (tx.type === 'settle') {
-          const settler = appConfig[tx.settlerKey];
-          const receiver = appConfig[tx.receiverKey];
+          const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+          const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
           html += `
-            <div class="history-card" style="background:#F0FDF4; border-color:#BBF7D0;">
-              <div class="hist-icon settle">🤝</div>
-              <div class="hist-info">
-                <div class="hist-title" style="color:#16A34A;">เคลียร์หนี้ / คืนเงิน</div>
-                <div class="hist-sub">
-                  <span>${tx.dateStr} ${tx.timeStr || ''}</span>
-                  <span>•</span>
-                  <span>${settler.avatar} โอนให้ ${receiver.avatar}</span>
+            <div class="recent-row" style="background:#F0FDF4; padding:8px 12px;">
+              <div class="recent-left">
+                <span class="recent-icon">🤝</span>
+                <div>
+                  <div class="recent-note" style="color:#16A34A;">เคลียร์หนี้เรียบร้อย</div>
+                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${settler.name} โอนให้ ${receiver.name}</div>
                 </div>
               </div>
-              <div class="hist-amt settle">฿${tx.amount.toLocaleString()}</div>
+              <div class="recent-right">
+                <span class="recent-amt" style="color:#16A34A;">฿${tx.amount.toLocaleString()}</span>
+                <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')">🗑️</button>
+              </div>
             </div>
           `;
         } else {
-          const payer = appConfig[tx.payerKey];
-          const splitLabel = tx.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน 100%';
+          const payer = appConfig[tx.payerKey] || { name: 'คนจ่าย', avatar: '👤' };
+          const splitLabel = tx.splitMode === 'half' ? 'หารครึ่ง' : 'จ่ายแทน';
           html += `
-            <div class="history-card">
-              <div class="hist-icon">${tx.catIcon || '💳'}</div>
-              <div class="hist-info">
-                <div class="hist-title">${escapeHtml(tx.note || tx.catName)}</div>
-                <div class="hist-sub">
-                  <span>${tx.dateStr} ${tx.timeStr || ''}</span>
-                  <span>•</span>
-                  <span>${payer.avatar} ${payer.name} (${splitLabel})</span>
+            <div class="recent-row" style="padding:8px 12px;">
+              <div class="recent-left">
+                <span class="recent-icon">${tx.catIcon || '💳'}</span>
+                <div>
+                  <div class="recent-note">${escapeHtml(tx.note || tx.catName)}</div>
+                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${payer.name} (${splitLabel})</div>
                 </div>
               </div>
-              <div class="hist-amt">฿${tx.amount.toLocaleString()}</div>
+              <div class="recent-right">
+                <span class="recent-amt">฿${tx.amount.toLocaleString()}</span>
+                <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')">🗑️</button>
+              </div>
             </div>
           `;
         }
       });
-
       container.innerHTML = html;
     }
 
+    /* ลบรายการ (กรณีกรอกข้อมูลผิด) */
+    function deleteTransaction(id) {
+      if (!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
+
+      transactions = transactions.filter(t => t.id !== id);
+      saveTransactions();
+      renderAll();
+      showToast('ลบรายการเรียบร้อย', '🗑️');
+
+      // Delete on Google Sheets if configured
+      if (appConfig.gasUrl) {
+        deleteOnGas(id);
+      }
+    }
+
     /* ========================================================
-       SETTLEMENT MODAL LOGIC
+       SETTLEMENT (ระบบเคลียร์หนี้)
        ======================================================== */
     function openSettleModal() {
       const { netDebt } = calculateDebt();
-      const absDebt = Math.abs(netDebt);
-      const roundedDebt = Math.round(absDebt * 100) / 100;
+      const rounded = Math.round(Math.abs(netDebt) * 100) / 100;
 
-      if (roundedDebt <= 0.01) {
+      if (rounded <= 0.01) {
         showToast('ยอดเคลียร์หมดแล้ว ไม่มีใครติดค้าง!', '🎉');
         return;
       }
@@ -1653,18 +1886,16 @@
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
       const amtEl = document.getElementById('modal-settle-amt');
-      const noteEl = document.getElementById('modal-settle-note');
-      const inputEl = document.getElementById('settle-custom-amt');
+      const descEl = document.getElementById('modal-settle-desc');
+      const inputEl = document.getElementById('in-settle-amt');
 
-      amtEl.textContent = `฿${roundedDebt.toLocaleString()}`;
-      inputEl.value = roundedDebt;
+      amtEl.textContent = `฿${rounded.toLocaleString()}`;
+      inputEl.value = rounded;
 
       if (netDebt > 0) {
-        // user2 -> user1
-        noteEl.textContent = `${u2.avatar} ${u2.name} โอนชำระให้ ${u1.avatar} ${u1.name}`;
+        descEl.textContent = `${u2.avatar} ${u2.name} โอนให้ ${u1.avatar} ${u1.name}`;
       } else {
-        // user1 -> user2
-        noteEl.textContent = `${u1.avatar} ${u1.name} โอนชำระให้ ${u2.avatar} ${u2.name}`;
+        descEl.textContent = `${u1.avatar} ${u1.name} โอนให้ ${u2.avatar} ${u2.name}`;
       }
 
       document.getElementById('modal-settle').classList.add('active');
@@ -1675,11 +1906,11 @@
     }
 
     function confirmSettle() {
-      const inputEl = document.getElementById('settle-custom-amt');
+      const inputEl = document.getElementById('in-settle-amt');
       const amt = parseFloat(inputEl.value);
 
       if (!amt || amt <= 0) {
-        showToast('กรุณาระบุจำนวนเงินที่ชำระ', '⚠️');
+        showToast('กรุณาระบุจำนวนเงิน', '⚠️');
         return;
       }
 
@@ -1699,6 +1930,7 @@
         receiverKey,
         amount: amt,
         type: 'settle',
+        note: 'เคลียร์หนี้เรียบร้อย',
         timestamp: Date.now()
       };
 
@@ -1708,101 +1940,74 @@
       renderAll();
 
       showToast(`🎉 เคลียร์หนี้ ฿${amt.toLocaleString()} สำเร็จ!`, '🤝');
-      syncToCloud();
+
+      if (appConfig.gasUrl) {
+        sendSettleToGas(settleTx);
+      }
     }
 
     /* ========================================================
-       PIN AUTHENTICATION LOGIC
+       GOOGLE SHEETS / GOOGLE APPS SCRIPT SYNC
        ======================================================== */
-    function openPinModal() {
-      pinTargetUserKey = appConfig.activeUserKey;
-      enteredPin = '';
-      updatePinTargetUI();
-      updatePinDots();
-      document.getElementById('modal-pin').classList.add('active');
+    function saveGasUrl() {
+      const url = document.getElementById('cfg-gas-url').value.trim();
+      appConfig.gasUrl = url;
+      saveConfig();
+      showToast('บันทึก Google Sheets URL แล้ว', '📊');
+      if (url) fetchFromGas();
     }
 
-    function closePinModal() {
-      document.getElementById('modal-pin').classList.remove('active');
-      enteredPin = '';
+    function fetchFromGas(silent = false) {
+      if (!appConfig.gasUrl) return;
+      if (!silent) showToast('กำลังซิงค์ข้อมูลจาก Google Sheets...', '🔄');
+
+      fetch(appConfig.gasUrl + '?action=getAll')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.status === 'success') {
+            if (Array.isArray(data.transactions) && data.transactions.length > 0) {
+              transactions = data.transactions;
+              saveTransactions();
+              renderAll();
+            }
+            if (!silent) showToast('ซิงค์ข้อมูลสำเร็จแล้ว!', '✅');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          if (!silent) showToast('เชื่อมต่อล้มเหลว ตรวจสอบ URL', '⚠️');
+        });
     }
 
-    function setPinTarget(key) {
-      pinTargetUserKey = key;
-      enteredPin = '';
-      updatePinTargetUI();
-      updatePinDots();
+    function sendBatchToGas(items) {
+      if (!appConfig.gasUrl) return;
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'addBatch', items: items })
+      }).catch(e => console.error('GAS addBatch err:', e));
     }
 
-    function updatePinTargetUI() {
-      const u1Btn = document.getElementById('pin-target-u1');
-      const u2Btn = document.getElementById('pin-target-u2');
-      if (pinTargetUserKey === 'user1') {
-        u1Btn.classList.add('active');
-        u2Btn.classList.remove('active');
-      } else {
-        u2Btn.classList.add('active');
-        u1Btn.classList.remove('active');
-      }
+    function deleteOnGas(id) {
+      if (!appConfig.gasUrl) return;
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteItem', id: id })
+      }).catch(e => console.error('GAS delete err:', e));
     }
 
-    function pressPin(digit) {
-      if (enteredPin.length < 4) {
-        enteredPin += digit;
-        updatePinDots();
-
-        if (enteredPin.length === 4) {
-          setTimeout(verifyPin, 100);
-        }
-      }
-    }
-
-    function backspacePin() {
-      if (enteredPin.length > 0) {
-        enteredPin = enteredPin.slice(0, -1);
-        updatePinDots();
-      }
-    }
-
-    function clearPin() {
-      enteredPin = '';
-      updatePinDots();
-    }
-
-    function updatePinDots() {
-      for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if (i < enteredPin.length) {
-          dot.classList.add('filled');
-        } else {
-          dot.classList.remove('filled');
-        }
-      }
-    }
-
-    function verifyPin() {
-      const targetUser = appConfig[pinTargetUserKey];
-      if (enteredPin === targetUser.pin) {
-        appConfig.activeUserKey = pinTargetUserKey;
-        currentPayerKey = pinTargetUserKey;
-        saveConfig();
-        applyConfigToUI();
-        closePinModal();
-        showToast(`🔓 เข้าสู่ระบบ: ${targetUser.avatar} ${targetUser.name}`, '👋');
-      } else {
-        showToast('❌ รหัส PIN ไม่ถูกต้อง', '❌');
-        // Shake animation effect
-        const dotsEl = document.querySelector('.pin-dots');
-        dotsEl.style.transform = 'translateX(10px)';
-        setTimeout(() => dotsEl.style.transform = 'translateX(-10px)', 80);
-        setTimeout(() => dotsEl.style.transform = 'translateX(0)', 160);
-        enteredPin = '';
-        setTimeout(updatePinDots, 200);
-      }
+    function sendSettleToGas(tx) {
+      if (!appConfig.gasUrl) return;
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'settleDebt', tx: tx })
+      }).catch(e => console.error('GAS settle err:', e));
     }
 
     /* ========================================================
-       SETTINGS & CLOUD SYNC
+       SETTINGS & UTILITIES
        ======================================================== */
     function saveUserSettings() {
       const u1Name = document.getElementById('cfg-u1-name').value.trim() || 'บอส';
@@ -1821,33 +2026,8 @@
       showToast('บันทึกการตั้งค่าเรียบร้อย!', '💾');
     }
 
-    function saveCloudUrl() {
-      const url = document.getElementById('cfg-gas-url').value.trim();
-      appConfig.gasUrl = url;
-      saveConfig();
-      showToast('บันทึก Google Sheets URL แล้ว', '☁️');
-      if (url) syncToCloud();
-    }
-
-    function syncToCloud() {
-      if (!appConfig.gasUrl) return;
-      // Background sync to GAS
-      try {
-        fetch(appConfig.gasUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'syncData',
-            transactions: transactions,
-            config: appConfig
-          })
-        }).catch(err => console.log('Sync err:', err));
-      } catch (e) {}
-    }
-
-    function clearAllHistoryPrompt() {
-      if (confirm('ต้องการล้างประวัติรายการทั้งหมดใช่หรือไม่? (ยอดหนี้จะรีเซ็ตเป็น 0)')) {
+    function confirmClearHistory() {
+      if (confirm('ต้องการล้างประวัติทั้งหมดใช่หรือไม่? (ยอดหนี้จะรีเซ็ตเป็น 0)')) {
         transactions = [];
         saveTransactions();
         renderAll();
@@ -1855,20 +2035,17 @@
       }
     }
 
-    /* ========================================================
-       UTILITIES
-       ======================================================== */
     function showToast(msg, icon = '✨') {
       const toast = document.getElementById('toast');
       document.getElementById('toast-icon').textContent = icon;
       document.getElementById('toast-text').textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      setTimeout(() => toast.classList.remove('show'), 2300);
     }
 
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/[&<>"']/g, m => ({
+      return String(str).replace(/[&<>"']/g, m => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
       })[m]);
     }
