@@ -1,16 +1,16 @@
 /**
- * Lunar (NB) Backend - Google Apps Script (Code.gs)
+ * Lunar Backend - Google Apps Script (Code.gs)
  * เชื่อมต่อ Google Sheets สำหรับบันทึกรายจ่าย 2 คนและเคลียร์หนี้
- * รองรับการแจ้งเตือนผ่าน LINE Messaging API
+ * รองรับการแจ้งเตือนผ่าน LINE Messaging API และดึง Group ID อัตโนมัติผ่าน Webhook
  */
 
 const SPREADSHEET_ID = "1C2zEgZLgSyGdD_Ef9gEezVYredxy1-SgYfHpOPcEV7o";
 const SHEET_TX_NAME = "Transactions";
 const SHEET_CFG_NAME = "Config";
 
-// ตั้งค่า LINE Notification (สามารถใส่ Token และ User/Group ID ได้ที่นี่ หรือระบุใน Sheet Config)
-const LINE_CHANNEL_ACCESS_TOKEN = ""; // ใส่ Channel Access Token ของ LINE Messaging API
-const LINE_TARGET_ID = "";            // ใส่ User ID หรือ Group ID ที่ต้องการให้แจ้งเตือน
+// LINE Token ที่ผู้ใช้ระบุ (หรือสามารถระบุใน Sheet Config คีย์ line_token ได้เช่นกัน)
+const LINE_CHANNEL_ACCESS_TOKEN = "8c7eb36f98c741c9a320ee5aa900766e";
+const LINE_TARGET_ID = ""; // หากว่างไว้ ระบบจะจับ Group ID ให้อัตโนมัติเมื่อดึงบอทเข้ากลุ่ม
 
 /**
  * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
@@ -86,14 +86,34 @@ function doGet(e) {
 }
 
 /**
- * จัดการคำขอ HTTP POST (บันทึก / ลบ / เคลียร์หนี้ / ตั้งค่าผู้ใช้)
+ * จัดการคำขอ HTTP POST (บันทึก / ลบ / เคลียร์หนี้ / LINE Webhook)
  */
 function doPost(e) {
   try {
     const postData = JSON.parse(e.postData.contents);
-    const action = postData.action;
     const ss = getSpreadsheet();
     initSheets(ss);
+
+    // ตรวจจับ Webhook จาก LINE Messaging API (เมื่อดึงบอทเข้ากลุ่มหรือส่งข้อความ)
+    if (postData.events && Array.isArray(postData.events)) {
+      postData.events.forEach(function(event) {
+        let targetId = "";
+        if (event.source) {
+          targetId = event.source.groupId || event.source.roomId || event.source.userId;
+        }
+        if (targetId) {
+          saveConfigValue(ss, "line_target_id", targetId);
+          Logger.log("✅ บันทึก LINE Target ID สำเร็จ: " + targetId);
+
+          if (event.replyToken) {
+            replyLineMessage(event.replyToken, "🌙 Lunar เชื่อมต่อกับกลุ่มนี้เรียบร้อยแล้ว!\nระบบจะแจ้งเตือนทุกครั้งที่มีการบันทึกรายจ่ายหรือเคลียร์หนี้ครับ ✨", ss);
+          }
+        }
+      });
+      return createJsonResponse({ status: "ok", message: "LINE Webhook handled" });
+    }
+
+    const action = postData.action;
 
     if (action === "addBatch") {
       const items = postData.items || [];
@@ -228,33 +248,57 @@ function getConfigData(ss) {
 function saveConfigData(ss, cfg) {
   const cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
   if (!cfgSheet) return;
-  cfgSheet.clear();
-  cfgSheet.appendRow(["Key", "Value"]);
   for (let k in cfg) {
     if (cfg.hasOwnProperty(k)) {
-      cfgSheet.appendRow([k, typeof cfg[k] === "object" ? JSON.stringify(cfg[k]) : cfg[k]]);
+      saveConfigValue(ss, k, typeof cfg[k] === "object" ? JSON.stringify(cfg[k]) : cfg[k]);
     }
   }
 }
 
-/**
- * ระบบส่งการแจ้งเตือนผ่าน LINE Messaging API
- */
-function sendLinePush(messageText, ss) {
-  let token = LINE_CHANNEL_ACCESS_TOKEN;
-  let targetId = LINE_TARGET_ID;
-
-  // หากไม่ได้ระบุในโค้ด ให้ค้นหาจาก Sheet Config
-  if (!token || !targetId) {
-    const cfg = getConfigData(ss);
-    if (cfg) {
-      token = token || cfg["line_token"];
-      targetId = targetId || cfg["line_target_id"];
+function saveConfigValue(ss, key, value) {
+  const cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
+  if (!cfgSheet) return;
+  const data = cfgSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === key) {
+      cfgSheet.getRange(i + 1, 2).setValue(value);
+      return;
     }
   }
+  cfgSheet.appendRow([key, value]);
+}
+
+/**
+ * ฟังก์ชันดึง Token สำหรับส่ง LINE
+ */
+function getLineToken(ss) {
+  if (LINE_CHANNEL_ACCESS_TOKEN && LINE_CHANNEL_ACCESS_TOKEN.length > 20) {
+    return LINE_CHANNEL_ACCESS_TOKEN;
+  }
+  const cfg = getConfigData(ss);
+  return (cfg && cfg["line_token"]) ? cfg["line_token"] : "";
+}
+
+/**
+ * ฟังก์ชันดึง Target ID สำหรับส่ง LINE
+ */
+function getLineTargetId(ss) {
+  if (LINE_TARGET_ID && LINE_TARGET_ID.length > 5) {
+    return LINE_TARGET_ID;
+  }
+  const cfg = getConfigData(ss);
+  return (cfg && cfg["line_target_id"]) ? cfg["line_target_id"] : "";
+}
+
+/**
+ * ระบบส่งการแจ้งเตือนผ่าน LINE Push Message
+ */
+function sendLinePush(messageText, ss) {
+  const token = getLineToken(ss);
+  const targetId = getLineTargetId(ss);
 
   if (!token || !targetId) {
-    Logger.log("ไม่ได้กำหนด LINE Token หรือ Target ID");
+    Logger.log("LINE Info: ยังไม่มี token หรือ targetId");
     return;
   }
 
@@ -281,6 +325,36 @@ function sendLinePush(messageText, ss) {
     });
   } catch (err) {
     Logger.log("LINE Notification Error: " + err.toString());
+  }
+}
+
+function replyLineMessage(replyToken, text, ss) {
+  const token = getLineToken(ss);
+  if (!token) return;
+
+  const url = "https://api.line.me/v2/bot/message/reply";
+  const payload = {
+    replyToken: replyToken,
+    messages: [
+      {
+        type: "text",
+        text: text
+      }
+    ]
+  };
+
+  try {
+    UrlFetchApp.fetch(url, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+  } catch (err) {
+    Logger.log("LINE Reply Error: " + err.toString());
   }
 }
 
