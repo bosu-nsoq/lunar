@@ -1,0 +1,25 @@
+{
+  "name": "DuoPay - บันทึกรายจ่าย 2 คน",
+  "short_name": "DuoPay",
+  "description": "เว็บแอปบันทึกรายจ่ายและเคลียร์หนี้สำหรับ 2 คน",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFF5F7",
+  "theme_color": "#FF6B8B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://api.iconify.design/fluent-emoji:money-with-wings.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://api.iconify.design/fluent-emoji:money-with-wings.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
