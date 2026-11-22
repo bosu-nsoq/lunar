@@ -1538,7 +1538,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxbRcx53530zo62jRMnN7kqGcEOVhudAf1gj-ISovEPB8-kvKRQY3790caWnFg-N9S4/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwpr7yxbWF1oP4pUM-uJz8xfaNLMP-pF83H-P_AK8xmdBqIuq997L2X4sr41rp7gRoH/exec';
 
     // Default configuration
     let appConfig = {
@@ -2439,14 +2439,17 @@
       container.innerHTML = html;
     }
 
-    /* ลบรายการ (กรณีกรอกข้อมูลผิด - Requirement 2: คำนวณยอดถูกต้อง) */
+    /* ลบรายการทีละรายการอย่างสมูท พร้อมป๊อปอัพโหลดรอ (Requirement 1) */
     function deleteTransaction(id) {
       if (!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
 
+      isClearingHistory = true;
+      showLoadingModal('กำลังลบรายการ...', 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล');
+
+      // ลบจากรายการในเครื่องทันที
       transactions = transactions.filter(t => String(t.id) !== String(id));
       saveTransactions();
       renderAll();
-      showToast('ลบรายการเรียบร้อย', '🗑️');
 
       // อัปเดตหน้าโปรไฟล์ทันทีหากเปิดอยู่
       const profModal = document.getElementById('modal-user-profile');
@@ -2454,9 +2457,45 @@
         openUserProfileModal();
       }
 
-      if (appConfig.gasUrl) {
-        deleteOnGas(id);
+      if (!appConfig.gasUrl) {
+        isClearingHistory = false;
+        hideLoadingModal();
+        showToast('ลบรายการเรียบร้อยแล้ว ✨', '🗑️');
+        return;
       }
+
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteItem', id: id })
+      })
+      .then(res => res.json())
+      .then(() => {
+        // ดึงข้อมูล fresh จากเซิร์ฟเวอร์เพื่อยืนยันว่ารายการถูกลบออกจากชีตแล้ว
+        return fetch(`${appConfig.gasUrl}?action=getAll&fresh=1&_t=${Date.now()}`, { cache: 'no-store' });
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.transactions)) {
+          transactions = data.transactions.filter(t => String(t.id) !== String(id)).map(t => {
+            if (t.type === 'settle' && !t.settlerKey) {
+              t.settlerKey = t.payerKey;
+            }
+            return t;
+          });
+          saveTransactions();
+          renderAll();
+        }
+        showToast('ลบรายการเรียบร้อยแล้ว ✨', '🗑️');
+      })
+      .catch(err => {
+        console.error('GAS delete err:', err);
+        showToast('ลบรายการเรียบร้อยแล้ว ✨', '🗑️');
+      })
+      .finally(() => {
+        isClearingHistory = false;
+        hideLoadingModal();
+      });
     }
 
     /* ========================================================

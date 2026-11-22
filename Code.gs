@@ -214,6 +214,7 @@ function doPost(e) {
           break;
         }
       }
+      clearDataCache();
 
       return createJsonResponse({ status: deleted ? "success" : "not_found", id: idToDelete });
     }
