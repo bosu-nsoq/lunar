@@ -23,15 +23,32 @@ function authorizeAndTestLine() {
   return result;
 }
 
+let _cachedSs = null;
+
 /**
- * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID)
+ * ดึง Spreadsheet อัตโนมัติ (รองรับทั้งเปิดตรงและเปิดผ่าน ID พร้อมแคชอินสแตนซ์)
  */
 function getSpreadsheet() {
+  if (_cachedSs) return _cachedSs;
   try {
-    const active = SpreadsheetApp.getActiveSpreadsheet();
-    if (active) return active;
+    _cachedSs = SpreadsheetApp.openById(SPREADSHEET_ID);
+    return _cachedSs;
+  } catch (e) {
+    try {
+      _cachedSs = SpreadsheetApp.getActiveSpreadsheet();
+      if (_cachedSs) return _cachedSs;
+    } catch (e2) {}
+    _cachedSs = SpreadsheetApp.openById(SPREADSHEET_ID);
+    return _cachedSs;
+  }
+}
+
+const CACHE_KEY = "lunar_all_v2";
+
+function clearDataCache() {
+  try {
+    CacheService.getScriptCache().remove(CACHE_KEY);
   } catch (e) {}
-  return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
 
 /**
@@ -72,27 +89,51 @@ function testConnection() {
 }
 
 /**
- * จัดการคำขอ HTTP GET (ดึงข้อมูล)
+ * จัดการคำขอ HTTP GET (ดึงข้อมูลความเร็วสูง พร้อมแคช Memcache ในตัว)
  */
 function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "getAll";
-    const ss = getSpreadsheet();
-    initSheets(ss);
+    const bypassCache = (e && e.parameter && (e.parameter.fresh === "1" || e.parameter.nocache === "1"));
 
     if (action === "testLine") {
+      const ss = getSpreadsheet();
       const res = testLineSendDirect(ss);
       return createJsonResponse(res);
     }
 
     if (action === "getAll") {
+      const cache = CacheService.getScriptCache();
+      if (!bypassCache) {
+        const cached = cache.get(CACHE_KEY);
+        if (cached) {
+          return ContentService.createTextOutput(cached)
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+
+      const ss = getSpreadsheet();
+      let txSheet = ss.getSheetByName(SHEET_TX_NAME);
+      let cfgSheet = ss.getSheetByName(SHEET_CFG_NAME);
+      if (!txSheet || !cfgSheet) {
+        initSheets(ss);
+      }
+
       const txData = getTransactionsData(ss);
       const cfgData = getConfigData(ss);
-      return createJsonResponse({
+      const payload = JSON.stringify({
         status: "success",
         transactions: txData,
         config: cfgData
       });
+
+      // แคชผลลัพธ์ไว้ 60 วินาที (หากมีการเขียนข้อมูลใหม่ ระบบจะล้างแคชทันที)
+      try {
+        cache.put(CACHE_KEY, payload, 60);
+      } catch (ce) {}
+
+      return ContentService.createTextOutput(payload)
+        .setMimeType(ContentService.MimeType.JSON);
     }
 
     return createJsonResponse({ status: "ok", message: "Lunar Backend is running" });
@@ -108,7 +149,7 @@ function doPost(e) {
   try {
     const postData = JSON.parse(e.postData.contents);
     const ss = getSpreadsheet();
-    initSheets(ss);
+    clearDataCache();
 
     // ตรวจจับ Webhook จาก LINE Messaging API (เมื่อดึงบอทเข้ากลุ่มหรือส่งข้อความ)
     if (postData.events && Array.isArray(postData.events)) {

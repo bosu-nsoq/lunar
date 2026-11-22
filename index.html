@@ -1522,7 +1522,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxHLULftoTSPBjWH7rusmId1V6fm8S_V1O4V60hMaEj9ndovQ9c9oB7MrawVdvsHRLU/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyzhRE8i1FfHLdxIzZn8xYw54XHjAMby9HPGWMspjhWF3tT0Pkyo5G3aOP9zfhyowLh/exec';
 
     // Default configuration
     let appConfig = {
@@ -1546,7 +1546,7 @@
       renderAll();
 
       // Fetch latest data and global config from Google Sheets
-      fetchFromGas(true);
+      fetchFromGas(true, true);
 
       // Register Service Worker
       if ('serviceWorker' in navigator) {
@@ -1555,12 +1555,16 @@
 
       // Auto-refresh when app becomes visible or focused (Requirement 6: ซิงค์สถานะคู่หูอัตโนมัติ)
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) fetchFromGas(true);
+        if (!document.hidden) fetchFromGas(true, true);
       });
       window.addEventListener('focus', () => {
-        fetchFromGas(true);
+        fetchFromGas(true, true);
       });
-      setInterval(() => fetchFromGas(true), 30000);
+      window.addEventListener('pageshow', () => {
+        fetchFromGas(true, true);
+      });
+
+      startRealtimeSync();
     });
 
     /* ========================================================
@@ -1775,6 +1779,7 @@
       if (targetNav) targetNav.classList.add('active');
 
       renderAll();
+      fetchFromGas(true);
     }
 
     function applyConfigToUI() {
@@ -2426,6 +2431,7 @@
        SETTLEMENT (ระบบเคลียร์หนี้)
        ======================================================== */
     function openSettleModal() {
+      fetchFromGas(true);
       const { netDebt } = calculateDebt();
       const rounded = Math.round(Math.abs(netDebt) * 100) / 100;
 
@@ -2558,6 +2564,7 @@
        USER PROFILE & MOOD STATUS MODAL (Requirement 3, 4, 5, 6)
        ======================================================== */
     function openUserProfileModal() {
+      fetchFromGas(true);
       const activeKey = appConfig.activeUserKey;
       const partnerKey = (activeKey === 'user1') ? 'user2' : 'user1';
       const active = appConfig[activeKey];
@@ -2640,6 +2647,8 @@
               user2: appConfig.user2
             }
           })
+        }).then(() => {
+          fetchFromGas(true, true);
         }).catch(err => console.error('saveAvatar err:', err));
       }
     }
@@ -2664,6 +2673,8 @@
               user2: appConfig.user2
             }
           })
+        }).then(() => {
+          fetchFromGas(true, true);
         }).catch(err => console.error('saveMood err:', err));
       }
     }
@@ -2728,12 +2739,20 @@
     }
 
     /* ========================================================
-       GOOGLE SHEETS / GOOGLE APPS SCRIPT SYNC
+       GOOGLE SHEETS / GOOGLE APPS SCRIPT REAL-TIME SYNC
        ======================================================== */
-    function fetchFromGas(silent = false) {
-      if (!appConfig.gasUrl) return;
+    let isFetchingGas = false;
+    let gasSyncTimer = null;
 
-      fetch(appConfig.gasUrl + '?action=getAll')
+    function fetchFromGas(silent = false, forceFresh = false) {
+      if (!appConfig.gasUrl) return;
+      if (isFetchingGas) return; // ป้องกันการเรียกซ้ำซ้อนขณะรอข้อมูล
+
+      isFetchingGas = true;
+      const freshParam = forceFresh ? '&fresh=1' : '';
+      const url = `${appConfig.gasUrl}?action=getAll${freshParam}&_t=${Date.now()}`;
+
+      fetch(url, { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           if (data && data.status === 'success') {
@@ -2760,9 +2779,22 @@
           }
         })
         .catch(err => {
-          console.error(err);
+          console.error('GAS sync err:', err);
           if (!silent) showToast('เชื่อมต่อล้มเหลว ตรวจสอบเครือข่าย', '⚠️');
+        })
+        .finally(() => {
+          isFetchingGas = false;
         });
+    }
+
+    function startRealtimeSync() {
+      if (gasSyncTimer) clearInterval(gasSyncTimer);
+      // Fast foreground sync every 3 seconds (เมื่อเปิดหน้าจอใช้งาน)
+      gasSyncTimer = setInterval(() => {
+        if (!document.hidden) {
+          fetchFromGas(true);
+        }
+      }, 3000);
     }
 
     function sendBatchToGas(items) {
@@ -2771,6 +2803,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'addBatch', items: items })
+      }).then(() => {
+        fetchFromGas(true, true);
       }).catch(e => console.error('GAS addBatch err:', e));
     }
 
@@ -2780,6 +2814,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'deleteItem', id: id })
+      }).then(() => {
+        fetchFromGas(true, true);
       }).catch(e => console.error('GAS delete err:', e));
     }
 
@@ -2789,6 +2825,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'clearHistory' })
+      }).then(() => {
+        fetchFromGas(true, true);
       }).catch(e => console.error('GAS clearHistory err:', e));
     }
 
@@ -2798,6 +2836,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'settleDebt', tx: tx })
+      }).then(() => {
+        fetchFromGas(true, true);
       }).catch(e => console.error('GAS settle err:', e));
     }
 
@@ -2831,6 +2871,8 @@
               user2: appConfig.user2
             }
           })
+        }).then(() => {
+          fetchFromGas(true, true);
         }).catch(err => console.error('saveConfig err:', err));
       }
 
