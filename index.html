@@ -185,55 +185,63 @@
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
-      transition: transform 0.15s;
+      transition: transform 0.15s, background 0.2s;
     }
+    .user-pill-btn:hover { background: rgba(255, 255, 255, 0.14); }
     .user-pill-btn:active { transform: scale(0.95); }
 
-    /* User Mood Button & Grid (Requirement 7) */
-    .user-mood-btn {
+    /* Partner Status Pill (Requirement 6) */
+    .partner-pill-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--glass-border-subtle);
-      padding: 4px 8px;
+      gap: 5px;
+      background: rgba(255, 209, 102, 0.1);
+      border: 1px solid rgba(255, 209, 102, 0.35);
+      color: var(--lunar-gold);
+      padding: 4px 9px;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 11.5px;
+      font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
       transition: transform 0.15s, background 0.2s;
       user-select: none;
     }
-    .user-mood-btn:hover {
-      background: rgba(255, 209, 102, 0.15);
-      border-color: rgba(255, 209, 102, 0.4);
-    }
-    .user-mood-btn:active { transform: scale(0.92); }
+    .partner-pill-btn:hover { background: rgba(255, 209, 102, 0.2); }
+    .partner-pill-btn:active { transform: scale(0.95); }
 
-    .mood-icon-grid {
+    /* Avatar & Mood Selection Grid (Requirement 5) */
+    .avatar-select-grid, .mood-icon-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      padding: 8px 0;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      padding: 4px 0 8px 0;
     }
-    .mood-icon-btn {
+    .avatar-select-btn, .mood-icon-btn {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--glass-border-subtle);
-      border-radius: 14px;
-      padding: 10px 4px;
-      font-size: 26px;
+      border-radius: 12px;
+      padding: 8px 2px;
+      font-size: 21px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
+      user-select: none;
     }
-    .mood-icon-btn:hover {
+    .avatar-select-btn:hover, .mood-icon-btn:hover {
       background: rgba(255, 209, 102, 0.18);
       border-color: rgba(255, 209, 102, 0.45);
       transform: translateY(-2px);
     }
-    .mood-icon-btn:active {
-      transform: scale(0.92);
+    .avatar-select-btn:active, .mood-icon-btn:active {
+      transform: scale(0.9);
+    }
+    .avatar-select-btn.active, .mood-icon-btn.active {
+      background: rgba(255, 209, 102, 0.25);
+      border-color: var(--lunar-gold);
+      box-shadow: 0 0 10px rgba(255, 209, 102, 0.4);
     }
 
     /* Main Container (Scroll locked inside view) */
@@ -987,14 +995,20 @@
         <span class="brand-title">Lunar</span>
       </div>
 
-      <!-- User Mood Status & Active User Display (Requirement 6 & 7) -->
+      <!-- Partner Status & Active User Profile Button (Requirement 3, 5, 6) -->
       <div style="display:flex; align-items:center; gap:6px;">
-        <div class="user-mood-btn" id="btn-user-mood" onclick="openMoodPickerModal()" title="แตะเพื่อเลือกสถานะ/อารมณ์">
-          <span id="hdr-user-mood">🥰</span>
+        <!-- Partner Pill (แสดงสถานะให้อีกคนเห็น) -->
+        <div class="partner-pill-btn" id="hdr-partner-pill" onclick="showPartnerMoodToast()" title="แตะเพื่อดูสถานะของแฟน">
+          <span id="hdr-partner-avatar">👩‍🦰</span>
+          <span id="hdr-partner-name">นิว</span>
+          <span id="hdr-partner-mood">🥰</span>
         </div>
-        <div class="user-pill-btn" onclick="openUserStatsModal()" title="แตะเพื่อดูยอดจ่ายสะสม">
+
+        <!-- Active User Profile Pill -->
+        <div class="user-pill-btn" onclick="openUserProfileModal()" title="แตะเพื่อดูข้อมูลโปรไฟล์และตั้งค่าสถานะ">
           <span id="hdr-user-avatar">🎅🏻</span>
           <span id="hdr-user-name">บอส</span>
+          <span id="hdr-user-mood-badge">🥰</span>
         </div>
       </div>
     </header>
@@ -1089,7 +1103,7 @@
 
           <!-- Submit All Trigger (เปิดป๊อปอัพตรวจสอบก่อนบันทึก) -->
           <button type="button" id="btn-submit-batch" class="btn-submit-all" onclick="openBatchConfirmModal()" disabled>
-            <span>🚀</span> <span>บันทึกข้อมูลทั้งหมด</span>
+            <span>🚀</span> <span>บันทึกข้อมูล</span>
           </button>
         </div>
 
@@ -1376,91 +1390,108 @@
 
         <!-- ปุ่มเสร็จสิ้น / บันทึกต่อ -->
         <button type="button" class="btn-add-batch" onclick="closePostSubmitModal()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle); padding:10px; font-size:13px; margin-top:2px;">
-          <span>✅</span> <span>เรียบร้อย (ทำรายการต่อ)</span>
+          <span>✅</span> <span>เรียบร้อย</span>
         </button>
       </div>
     </div>
 
     <!-- ========================================================
-         MODAL: ยอดจ่ายสะสมของผู้ใช้งาน (Requirement 6)
+         MODAL: ข้อมูลโปรไฟล์ & ตั้งค่าสถานะ (Requirement 3, 4, 5, 6)
          ======================================================== -->
-    <div id="modal-user-stats" class="modal-backdrop">
-      <div class="bottom-sheet">
+    <div id="modal-user-profile" class="modal-backdrop">
+      <div class="bottom-sheet" style="max-height: 85vh; overflow-y: auto;">
         <div class="modal-head">
-          <span>📊 ข้อมูลยอดจ่ายสะสม</span>
-          <button type="button" class="modal-close-btn" onclick="closeUserStatsModal()">✕</button>
+          <span style="color:var(--lunar-gold);">👤 ข้อมูลโปรไฟล์</span>
+          <button type="button" class="modal-close-btn" onclick="closeUserProfileModal()">✕</button>
         </div>
 
-        <div style="font-size:12px; color:var(--text-muted); margin-bottom:2px;">
-          สรุปยอดเงินที่แต่ละคนจ่ายสะสมไปทั้งหมด:
-        </div>
-
-        <!-- 2 User Stat Cards -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="glass-card" style="text-align: center; padding: 12px 8px;">
-            <div style="font-size: 30px;" id="u-stats-u1-avatar">🎅🏻</div>
-            <div style="font-size: 14px; font-weight:700; margin-top:2px;" id="u-stats-u1-name">บอส</div>
-            <div style="font-size: 18px; font-weight:700; color:var(--lunar-gold); margin-top:4px;" id="u-stats-u1-amt">฿0</div>
-            <div style="font-size: 10.5px; color:var(--text-muted);" id="u-stats-u1-count">0 รายการ</div>
+        <!-- 1. Active User Summary Card (แสดงเฉพาะผู้ใช้คนนี้ - Requirement 3) -->
+        <div class="glass-card" style="text-align: center; padding: 12px 10px; background: rgba(255, 209, 102, 0.08); border-color: rgba(255, 209, 102, 0.35);">
+          <div style="font-size: 38px; line-height: 1.1;" id="u-prof-avatar">🎅🏻</div>
+          <div style="font-size: 15px; font-weight: 700; color: #FFF; margin-top: 2px;" id="u-prof-name">บอส</div>
+          <div style="display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; padding: 3px 10px; border-radius: 20px; background: rgba(255, 255, 255, 0.08); font-size: 12px;">
+            <span style="color:var(--text-muted);">สถานะปัจจุบัน:</span>
+            <span id="u-prof-current-mood" style="font-size: 15px;">🥰</span>
           </div>
-          <div class="glass-card" style="text-align: center; padding: 12px 8px;">
-            <div style="font-size: 30px;" id="u-stats-u2-avatar">👩‍🦰</div>
-            <div style="font-size: 14px; font-weight:700; margin-top:2px;" id="u-stats-u2-name">นิว</div>
-            <div style="font-size: 18px; font-weight:700; color:var(--lunar-gold); margin-top:4px;" id="u-stats-u2-amt">฿0</div>
-            <div style="font-size: 10.5px; color:var(--text-muted);" id="u-stats-u2-count">0 รายการ</div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--glass-border-subtle);">
+            <div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">ยอดจ่ายสะสม</div>
+              <div style="font-size: 17px; font-weight: 700; color: var(--lunar-gold); margin-top: 2px;" id="u-prof-amt">฿0</div>
+            </div>
+            <div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">จำนวนรายการ</div>
+              <div style="font-size: 17px; font-weight: 700; color: var(--text-white); margin-top: 2px;" id="u-prof-count">0 รายการ</div>
+            </div>
           </div>
         </div>
 
-        <!-- Overall Summary -->
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(255,209,102,0.08); border-radius:14px; border:1px solid rgba(255,209,102,0.3);">
-          <span style="font-size:12.5px; font-weight:600;">ยอดจ่ายรวมทั้งคู่:</span>
-          <span id="u-stats-total-all" style="font-size:16px; font-weight:700; color:var(--lunar-gold);">฿0</span>
+        <!-- 2. Partner Status Banner (แสดงสถานะให้อีกคนเห็น - Requirement 6) -->
+        <div class="glass-card" style="padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 26px;" id="u-prof-partner-avatar">👩‍🦰</span>
+            <div>
+              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-white);" id="u-prof-partner-name">สถานะของ นิว</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">คู่หูของคุณ</div>
+            </div>
+          </div>
+          <span id="u-prof-partner-mood-icon" style="font-size: 26px;">🥰</span>
         </div>
 
-        <!-- Action Buttons -->
-        <div style="display:flex; gap:8px; margin-top:4px;">
-          <button type="button" class="btn-add-batch" onclick="switchActiveUserModal()" style="flex:1; padding:9px; font-size:12.5px; background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
-            <span>🔄</span> <span>สลับผู้ใช้</span>
-          </button>
-          <button type="button" class="btn-add-batch" onclick="closeUserStatsModal(); lockAppScreen();" style="flex:1; padding:9px; font-size:12.5px; background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
-            <span>🔒</span> <span>ล็อกหน้าจอ</span>
-          </button>
+        <!-- 3. Avatar Picker (เปลี่ยนอวตาร์ประจำตัว - Requirement 5) -->
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--lunar-gold); margin-bottom: 4px;">
+            🎭 เปลี่ยนอวตาร์ประจำตัว (แตะเพื่อเปลี่ยน)
+          </div>
+          <div class="avatar-select-grid">
+            <button type="button" class="avatar-select-btn" data-avatar="🎅🏻" onclick="chooseUserAvatar('🎅🏻')">🎅🏻</button>
+            <button type="button" class="avatar-select-btn" data-avatar="👩‍🦰" onclick="chooseUserAvatar('👩‍🦰')">👩‍🦰</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🧑‍🦱" onclick="chooseUserAvatar('🧑‍🦱')">🧑‍🦱</button>
+            <button type="button" class="avatar-select-btn" data-avatar="👧" onclick="chooseUserAvatar('👧')">👧</button>
+            <button type="button" class="avatar-select-btn" data-avatar="👸" onclick="chooseUserAvatar('👸')">👸</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🤴" onclick="chooseUserAvatar('🤴')">🤴</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐶" onclick="chooseUserAvatar('🐶')">🐶</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐱" onclick="chooseUserAvatar('🐱')">🐱</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐻" onclick="chooseUserAvatar('🐻')">🐻</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐰" onclick="chooseUserAvatar('🐰')">🐰</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🦊" onclick="chooseUserAvatar('🦊')">🦊</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐼" onclick="chooseUserAvatar('🐼')">🐼</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🦁" onclick="chooseUserAvatar('🦁')">🦁</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐯" onclick="chooseUserAvatar('🐯')">🐯</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐧" onclick="chooseUserAvatar('🐧')">🐧</button>
+            <button type="button" class="avatar-select-btn" data-avatar="🐨" onclick="chooseUserAvatar('🐨')">🐨</button>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- ========================================================
-         MODAL: เลือกสถานะ / อารมณ์ (Requirement 7)
-         ======================================================== -->
-    <div id="modal-mood-picker" class="modal-backdrop">
-      <div class="bottom-sheet">
-        <div class="modal-head">
-          <span style="color:var(--lunar-gold);">💖 สถานะ & ความรู้สึก</span>
-          <button type="button" class="modal-close-btn" onclick="closeMoodPickerModal()">✕</button>
+        <!-- 4. Mood Picker (เปลี่ยนสถานะ / อารมณ์ความรู้สึก - Requirement 5) -->
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--lunar-gold); margin-bottom: 4px;">
+            💖 เปลี่ยนสถานะ / อารมณ์ความรู้สึก (แตะเพื่อเปลี่ยน)
+          </div>
+          <div class="mood-icon-grid">
+            <button type="button" class="mood-icon-btn" data-mood="🥰" onclick="chooseUserMood('🥰')" title="รักนะ / หวานใจ">🥰</button>
+            <button type="button" class="mood-icon-btn" data-mood="💖" onclick="chooseUserMood('💖')" title="ใจฟู">💖</button>
+            <button type="button" class="mood-icon-btn" data-mood="🥺" onclick="chooseUserMood('🥺')" title="อ้อนแฟน">🥺</button>
+            <button type="button" class="mood-icon-btn" data-mood="😋" onclick="chooseUserMood('😋')" title="หิวแล้ว">😋</button>
+            <button type="button" class="mood-icon-btn" data-mood="😴" onclick="chooseUserMood('😴')" title="ง่วงนอน">😴</button>
+            <button type="button" class="mood-icon-btn" data-mood="🥳" onclick="chooseUserMood('🥳')" title="อารมณ์ดี">🥳</button>
+            <button type="button" class="mood-icon-btn" data-mood="☕" onclick="chooseUserMood('☕')" title="พักผ่อน">☕</button>
+            <button type="button" class="mood-icon-btn" data-mood="💸" onclick="chooseUserMood('💸')" title="สายเปย์">💸</button>
+            <button type="button" class="mood-icon-btn" data-mood="🍽️" onclick="chooseUserMood('🍽️')" title="กำลังกินข้าว">🍽️</button>
+            <button type="button" class="mood-icon-btn" data-mood="🛍️" onclick="chooseUserMood('🛍️')" title="ช็อปปิ้ง">🛍️</button>
+            <button type="button" class="mood-icon-btn" data-mood="🚗" onclick="chooseUserMood('🚗')" title="กำลังเดินทาง">🚗</button>
+            <button type="button" class="mood-icon-btn" data-mood="🎮" onclick="chooseUserMood('🎮')" title="เล่นเกม">🎮</button>
+            <button type="button" class="mood-icon-btn" data-mood="🤒" onclick="chooseUserMood('🤒')" title="ไม่สบาย">🤒</button>
+            <button type="button" class="mood-icon-btn" data-mood="😤" onclick="chooseUserMood('😤')" title="งอนอยู่นะ">😤</button>
+            <button type="button" class="mood-icon-btn" data-mood="🌟" onclick="chooseUserMood('🌟')" title="มีความสุข">🌟</button>
+            <button type="button" class="mood-icon-btn" data-mood="🌕" onclick="chooseUserMood('🌕')" title="Lunar เต็มดวง">🌕</button>
+          </div>
         </div>
 
-        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">
-          แตะเลือกไอคอนเพื่อบอกความรู้สึกให้แฟนรู้:
-        </div>
-
-        <div class="mood-icon-grid">
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥰')" title="รักนะ / หวานใจ"><span>🥰</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('💖')" title="ใจฟู"><span>💖</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥺')" title="อ้อนแฟน"><span>🥺</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😋')" title="หิวแล้ว"><span>😋</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😴')" title="ง่วงนอน"><span>😴</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥳')" title="อารมณ์ดี"><span>🥳</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('☕')" title="พักผ่อน"><span>☕</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('💸')" title="สายเปย์"><span>💸</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🍽️')" title="กำลังกินข้าว"><span>🍽️</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🛍️')" title="ช็อปปิ้ง"><span>🛍️</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🚗')" title="กำลังเดินทาง"><span>🚗</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🎮')" title="เล่นเกม"><span>🎮</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🤒')" title="ไม่สบาย"><span>🤒</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😤')" title="งอนอยู่นะ"><span>😤</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🌟')" title="มีความสุข"><span>🌟</span></button>
-          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🌕')" title="Lunar เต็มดวง"><span>🌕</span></button>
-        </div>
+        <!-- ปุ่มเรียบร้อย -->
+        <button type="button" class="btn-add-batch" onclick="closeUserProfileModal()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle); padding:10px; font-size:13px; margin-top:2px;">
+          <span>✅</span> <span>เรียบร้อย</span>
+        </button>
       </div>
     </div>
 
@@ -1504,6 +1535,15 @@
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }
+
+      // Auto-refresh when app becomes visible or focused (Requirement 6: ซิงค์สถานะคู่หูอัตโนมัติ)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) fetchFromGas(true);
+      });
+      window.addEventListener('focus', () => {
+        fetchFromGas(true);
+      });
+      setInterval(() => fetchFromGas(true), 30000);
     });
 
     /* ========================================================
@@ -1709,17 +1749,26 @@
     function applyConfigToUI() {
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
-      const active = appConfig[appConfig.activeUserKey];
+      const activeKey = appConfig.activeUserKey;
+      const partnerKey = (activeKey === 'user1') ? 'user2' : 'user1';
+      const active = appConfig[activeKey];
+      const partner = appConfig[partnerKey];
 
       // Header User Pill
       const hAv = document.getElementById('hdr-user-avatar');
       if (hAv) hAv.textContent = active.avatar;
       const hNm = document.getElementById('hdr-user-name');
       if (hNm) hNm.textContent = active.name;
+      const hMoodBadge = document.getElementById('hdr-user-mood-badge');
+      if (hMoodBadge) hMoodBadge.textContent = active.mood || '🥰';
 
-      // Header User Mood (Requirement 7)
-      const hMood = document.getElementById('hdr-user-mood');
-      if (hMood) hMood.textContent = active.mood || '🥰';
+      // Header Partner Pill (Requirement 6: แสดงสถานะให้อีกคนเห็น)
+      const pAv = document.getElementById('hdr-partner-avatar');
+      if (pAv) pAv.textContent = partner.avatar;
+      const pNm = document.getElementById('hdr-partner-name');
+      if (pNm) pNm.textContent = partner.name;
+      const pMood = document.getElementById('hdr-partner-mood');
+      if (pMood) pMood.textContent = partner.mood || '🥰';
 
       // Recorder Status in Form (หากมี)
       const recEl = document.getElementById('recorder-display-name');
@@ -1927,7 +1976,7 @@
       closePostSubmitModal();
       closeBatchConfirmModal();
       closeSettleModal();
-      closeUserStatsModal();
+      closeUserProfileModal();
 
       const encoded = encodeURIComponent(msg);
       const lineUrl = "https://line.me/R/msg/text/?" + encoded;
@@ -2388,64 +2437,93 @@
     }
 
     /* ========================================================
-       USER STATS MODAL (Requirement 6)
+       USER PROFILE & MOOD STATUS MODAL (Requirement 3, 4, 5, 6)
        ======================================================== */
-    function openUserStatsModal() {
-      const u1 = appConfig.user1;
-      const u2 = appConfig.user2;
+    function openUserProfileModal() {
+      const activeKey = appConfig.activeUserKey;
+      const partnerKey = (activeKey === 'user1') ? 'user2' : 'user1';
+      const active = appConfig[activeKey];
+      const partner = appConfig[partnerKey];
 
-      let u1Paid = 0, u1Count = 0;
-      let u2Paid = 0, u2Count = 0;
-
+      // คำนวณยอดเงินเฉพาะผู้ใช้ที่เข้าสู่ระบบ (Requirement 3)
+      let paid = 0, count = 0;
       transactions.forEach(tx => {
-        if (tx.type === 'expense') {
-          if (tx.payerKey === 'user1') {
-            u1Paid += tx.amount;
-            u1Count++;
-          } else if (tx.payerKey === 'user2') {
-            u2Paid += tx.amount;
-            u2Count++;
-          }
+        if (tx.type === 'expense' && tx.payerKey === activeKey) {
+          paid += tx.amount;
+          count++;
         }
       });
 
-      document.getElementById('u-stats-u1-avatar').textContent = u1.avatar;
-      document.getElementById('u-stats-u1-name').textContent = u1.name;
-      document.getElementById('u-stats-u1-amt').textContent = `฿${u1Paid.toLocaleString()}`;
-      document.getElementById('u-stats-u1-count').textContent = `${u1Count} รายการ`;
+      // ข้อมูลผู้ใช้งานปัจจุบัน
+      const avEl = document.getElementById('u-prof-avatar');
+      if (avEl) avEl.textContent = active.avatar;
+      const nmEl = document.getElementById('u-prof-name');
+      if (nmEl) nmEl.textContent = active.name;
+      const moodEl = document.getElementById('u-prof-current-mood');
+      if (moodEl) moodEl.textContent = active.mood || '🥰';
 
-      document.getElementById('u-stats-u2-avatar').textContent = u2.avatar;
-      document.getElementById('u-stats-u2-name').textContent = u2.name;
-      document.getElementById('u-stats-u2-amt').textContent = `฿${u2Paid.toLocaleString()}`;
-      document.getElementById('u-stats-u2-count').textContent = `${u2Count} รายการ`;
+      const amtEl = document.getElementById('u-prof-amt');
+      if (amtEl) amtEl.textContent = `฿${paid.toLocaleString()}`;
+      const cntEl = document.getElementById('u-prof-count');
+      if (cntEl) cntEl.textContent = `${count} รายการ`;
 
-      document.getElementById('u-stats-total-all').textContent = `฿${(u1Paid + u2Paid).toLocaleString()}`;
+      // ข้อมูลสถานะของอีกคน (Requirement 6)
+      const pAv = document.getElementById('u-prof-partner-avatar');
+      if (pAv) pAv.textContent = partner.avatar;
+      const pNm = document.getElementById('u-prof-partner-name');
+      if (pNm) pNm.textContent = `สถานะของ ${partner.name}`;
+      const pMoodIcon = document.getElementById('u-prof-partner-mood-icon');
+      if (pMoodIcon) pMoodIcon.textContent = partner.mood || '🥰';
 
-      document.getElementById('modal-user-stats').classList.add('active');
+      // ไฮไลต์อวตาร์ที่เลือก
+      document.querySelectorAll('.avatar-select-btn').forEach(btn => {
+        if (btn.getAttribute('data-avatar') === active.avatar) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // ไฮไลต์สถานะที่เลือก
+      document.querySelectorAll('.mood-icon-btn').forEach(btn => {
+        if (btn.getAttribute('data-mood') === (active.mood || '🥰')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const modal = document.getElementById('modal-user-profile');
+      if (modal) modal.classList.add('active');
     }
 
-    function closeUserStatsModal() {
-      document.getElementById('modal-user-stats').classList.remove('active');
+    function closeUserProfileModal() {
+      const modal = document.getElementById('modal-user-profile');
+      if (modal) modal.classList.remove('active');
     }
 
-    function switchActiveUserModal() {
-      appConfig.activeUserKey = (appConfig.activeUserKey === 'user1') ? 'user2' : 'user1';
+    function chooseUserAvatar(avatar) {
+      const activeKey = appConfig.activeUserKey;
+      if (!appConfig[activeKey]) return;
+      appConfig[activeKey].avatar = avatar;
       saveConfig();
       applyConfigToUI();
-      closeUserStatsModal();
-      const active = appConfig[appConfig.activeUserKey];
-      showToast(`สลับเป็น ${active.avatar} ${active.name} แล้ว`, '🔄');
-    }
+      openUserProfileModal();
+      showToast(`เปลี่ยนอวตาร์เป็น ${avatar} แล้ว ✨`, avatar);
 
-    /* ========================================================
-       MOOD PICKER (Requirement 7)
-       ======================================================== */
-    function openMoodPickerModal() {
-      document.getElementById('modal-mood-picker').classList.add('active');
-    }
-
-    function closeMoodPickerModal() {
-      document.getElementById('modal-mood-picker').classList.remove('active');
+      if (appConfig.gasUrl) {
+        fetch(appConfig.gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'saveConfig',
+            config: {
+              user1: appConfig.user1,
+              user2: appConfig.user2
+            }
+          })
+        }).catch(err => console.error('saveAvatar err:', err));
+      }
     }
 
     function chooseUserMood(icon) {
@@ -2454,7 +2532,7 @@
       appConfig[activeKey].mood = icon;
       saveConfig();
       applyConfigToUI();
-      closeMoodPickerModal();
+      openUserProfileModal();
       showToast(`เปลี่ยนสถานะเป็น ${icon} แล้ว ✨`, icon);
 
       if (appConfig.gasUrl) {
@@ -2471,6 +2549,20 @@
         }).catch(err => console.error('saveMood err:', err));
       }
     }
+
+    function showPartnerMoodToast() {
+      const activeKey = appConfig.activeUserKey;
+      const partnerKey = (activeKey === 'user1') ? 'user2' : 'user1';
+      const partner = appConfig[partnerKey];
+      const mood = partner.mood || '🥰';
+      showToast(`สถานะของ ${partner.name}: ${mood}`, mood);
+    }
+
+    // Compatibility wrappers
+    function openUserStatsModal() { openUserProfileModal(); }
+    function closeUserStatsModal() { closeUserProfileModal(); }
+    function openMoodPickerModal() { openUserProfileModal(); }
+    function closeMoodPickerModal() { closeUserProfileModal(); }
 
     /* ========================================================
        SETTLE HISTORY (Requirement 4)
