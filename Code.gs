@@ -177,6 +177,17 @@ function doPost(e) {
       return createJsonResponse({ status: deleted ? "success" : "not_found", id: idToDelete });
     }
 
+    if (action === "clearHistory" || action === "clearAll") {
+      const txSheet = ss.getSheetByName(SHEET_TX_NAME);
+      if (txSheet) {
+        const lastRow = txSheet.getLastRow();
+        if (lastRow > 1) {
+          txSheet.deleteRows(2, lastRow - 1);
+        }
+      }
+      return createJsonResponse({ status: "success", message: "All transactions cleared" });
+    }
+
     if (action === "settleDebt") {
       const settleTx = postData.tx;
       const txSheet = ss.getSheetByName(SHEET_TX_NAME);

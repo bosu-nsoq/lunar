@@ -995,21 +995,11 @@
         <span class="brand-title">Lunar</span>
       </div>
 
-      <!-- Partner Status & Active User Profile Button (Requirement 3, 5, 6) -->
-      <div style="display:flex; align-items:center; gap:6px;">
-        <!-- Partner Pill (แสดงสถานะให้อีกคนเห็น) -->
-        <div class="partner-pill-btn" id="hdr-partner-pill" onclick="showPartnerMoodToast()" title="แตะเพื่อดูสถานะของแฟน">
-          <span id="hdr-partner-avatar">👩‍🦰</span>
-          <span id="hdr-partner-name">นิว</span>
-          <span id="hdr-partner-mood">🥰</span>
-        </div>
-
-        <!-- Active User Profile Pill -->
-        <div class="user-pill-btn" onclick="openUserProfileModal()" title="แตะเพื่อดูข้อมูลโปรไฟล์และตั้งค่าสถานะ">
-          <span id="hdr-user-avatar">🎅🏻</span>
-          <span id="hdr-user-name">บอส</span>
-          <span id="hdr-user-mood-badge">🥰</span>
-        </div>
+      <!-- Active User Profile Pill (Requirement 1: แสดงแค่ผู้ใช้ที่ล็อกอิน) -->
+      <div class="user-pill-btn" onclick="openUserProfileModal()" title="แตะเพื่อดูข้อมูลโปรไฟล์และตั้งค่าสถานะ">
+        <span id="hdr-user-avatar">🎅🏻</span>
+        <span id="hdr-user-name">บอส</span>
+        <span id="hdr-user-mood-badge">🥰</span>
       </div>
     </header>
 
@@ -1355,10 +1345,37 @@
         <button type="button" class="btn-submit-all" onclick="confirmSettle()" style="margin-top: 6px;">
           <span>✅</span> <span>ยืนยันเคลียร์หนี้เรียบร้อย</span>
         </button>
+      </div>
+    </div>
 
-        <!-- ปุ่มทางเลือก: แชร์สลิป/หลักฐานเคลียร์หนี้เข้า LINE ทันที -->
-        <button type="button" class="btn-add-batch" onclick="shareSettleToLineApp()" style="background:#06C755; color:#FFF; padding:10px; font-size:13px; margin-top:4px; box-shadow:0 4px 14px rgba(6,199,85,0.3);">
-          <span>💬</span> <span>แชร์สลิป/หลักฐานเคลียร์หนี้เข้า LINE ทันที</span>
+    <!-- ========================================================
+         MODAL: ส่งยอดเคลียร์หนี้เข้า LINE หลังเคลียร์หนี้ (Requirement 5)
+         ======================================================== -->
+    <div id="modal-post-settle" class="modal-backdrop">
+      <div class="bottom-sheet">
+        <div class="modal-head">
+          <span style="color:var(--accent-mint);">🎉 เคลียร์หนี้สำเร็จเรียบร้อย</span>
+          <button type="button" class="modal-close-btn" onclick="closePostSettleModal()">✕</button>
+        </div>
+
+        <div style="text-align:center; padding:8px 0;">
+          <div style="font-size:38px; margin-bottom:4px;">🤝🌕✨</div>
+          <div style="font-size:14.5px; font-weight:700; color:#FFF;" id="post-settle-summary-txt">
+            เคลียร์หนี้เรียบร้อยแล้ว
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+            แตะปุ่มด้านล่างเพื่อส่งสรุปการเคลียร์หนี้ไปในแอป LINE ให้คู่หู
+          </div>
+        </div>
+
+        <!-- ปุ่มส่งยอดไปในไลน์ -->
+        <button type="button" class="btn-add-batch" onclick="triggerSendPostSettleToLine()" style="background:#06C755; color:#FFF; padding:12px; font-size:14.5px; font-weight:700; box-shadow:0 4px 16px rgba(6,199,85,0.4); margin-top:2px;">
+          <span>💬</span> <span>ส่งยอดไปในไลน์</span>
+        </button>
+
+        <!-- ปุ่มเรียบร้อย -->
+        <button type="button" class="btn-add-batch" onclick="closePostSettleModal()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle); padding:10px; font-size:13px; margin-top:2px;">
+          <span>✅</span> <span>เรียบร้อย</span>
         </button>
       </div>
     </div>
@@ -1505,7 +1522,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzcdT7eVZ_fMuSL_KVDKdyutTEmunwJR3UndGCmc1Xwz1bovSPloPqJaTrSKIzRTN2V/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwcEskU8ytRtQUTiCXG64gPdqHCC3g8h6DZbVBQoIjk_DxZeRMfyeoXCNYMw7Pwdz4/exec';
 
     // Default configuration
     let appConfig = {
@@ -1974,6 +1991,7 @@
     function sendToLineApp(msg) {
       // ปิด modal ทั้งหมดเพื่อให้เด้งกลับหน้าจอทำงานอัตโนมัติ ไม่ค้างหน้าจอขาว (Requirement 3)
       closePostSubmitModal();
+      closePostSettleModal();
       closeBatchConfirmModal();
       closeSettleModal();
       closeUserProfileModal();
@@ -2041,6 +2059,51 @@
         return;
       }
       const msg = buildBatchLineMessage(latestSavedBatch);
+      sendToLineApp(msg);
+    }
+
+    /* ========================================================
+       POST-SETTLE LINE MODAL (Requirement 5)
+       ======================================================== */
+    let latestSettleTx = null;
+
+    function buildSettleLineMessage(tx) {
+      if (!tx) return "";
+      const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+      const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+      const dateStr = tx.dateStr || getTodayThaiDate();
+      const timeStr = tx.timeStr || "";
+
+      let msg = "🤝 Lunar 🌕 — เคลียร์หนี้เรียบร้อยแล้ว!\n";
+      msg += "💸 ยอดโอนเคลียร์: ฿" + (tx.amount || 0).toLocaleString() + " บาท\n";
+      msg += "📤 ผู้โอน: " + settler.avatar + " " + settler.name + "\n";
+      msg += "📥 ผู้รับ: " + receiver.avatar + " " + receiver.name + "\n";
+      msg += "📅 วันที่: " + dateStr + (timeStr ? " " + timeStr : "") + "\n";
+      msg += "🎉 สถานะ: ปรับยอดหนี้คงค้างเป็น 0 เรียบร้อย!";
+      return msg;
+    }
+
+    function openPostSettleModal(tx) {
+      latestSettleTx = tx;
+      const sumEl = document.getElementById('post-settle-summary-txt');
+      if (sumEl && tx) {
+        sumEl.textContent = `เคลียร์หนี้ ฿${(tx.amount || 0).toLocaleString()} เรียบร้อยแล้ว`;
+      }
+      const modal = document.getElementById('modal-post-settle');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closePostSettleModal() {
+      const modal = document.getElementById('modal-post-settle');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function triggerSendPostSettleToLine() {
+      if (!latestSettleTx) {
+        closePostSettleModal();
+        return;
+      }
+      const msg = buildSettleLineMessage(latestSettleTx);
       sendToLineApp(msg);
     }
 
@@ -2297,14 +2360,20 @@
       container.innerHTML = html;
     }
 
-    /* ลบรายการ (กรณีกรอกข้อมูลผิด) */
+    /* ลบรายการ (กรณีกรอกข้อมูลผิด - Requirement 2: คำนวณยอดถูกต้อง) */
     function deleteTransaction(id) {
       if (!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
 
-      transactions = transactions.filter(t => t.id !== id);
+      transactions = transactions.filter(t => String(t.id) !== String(id));
       saveTransactions();
       renderAll();
       showToast('ลบรายการเรียบร้อย', '🗑️');
+
+      // อัปเดตหน้าโปรไฟล์ทันทีหากเปิดอยู่
+      const profModal = document.getElementById('modal-user-profile');
+      if (profModal && profModal.classList.contains('active')) {
+        openUserProfileModal();
+      }
 
       if (appConfig.gasUrl) {
         deleteOnGas(id);
@@ -2384,6 +2453,9 @@
       if (appConfig.gasUrl) {
         sendSettleToGas(settleTx);
       }
+
+      // แสดงป๊อปอัพสำหรับส่งเข้าไลน์หลังเคลียร์หนี้ (Requirement 5)
+      openPostSettleModal(settleTx);
     }
 
     /* ========================================================
@@ -2625,8 +2697,8 @@
               applyConfigToUI();
             }
 
-            // ซิงค์รายการธุรกรรม
-            if (Array.isArray(data.transactions) && data.transactions.length > 0) {
+            // ซิงค์รายการธุรกรรม (Requirement 6: แสดงผลเรียลไทม์)
+            if (Array.isArray(data.transactions)) {
               transactions = data.transactions;
               saveTransactions();
               renderAll();
@@ -2656,6 +2728,15 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'deleteItem', id: id })
       }).catch(e => console.error('GAS delete err:', e));
+    }
+
+    function clearAllOnGas() {
+      if (!appConfig.gasUrl) return;
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'clearHistory' })
+      }).catch(e => console.error('GAS clearHistory err:', e));
     }
 
     function sendSettleToGas(tx) {
@@ -2709,6 +2790,10 @@
         saveTransactions();
         renderAll();
         showToast('ล้างประวัติเรียบร้อย', '🗑️');
+
+        if (appConfig.gasUrl) {
+          clearAllOnGas();
+        }
       }
     }
 
