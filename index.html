@@ -189,6 +189,53 @@
     }
     .user-pill-btn:active { transform: scale(0.95); }
 
+    /* User Mood Button & Grid (Requirement 7) */
+    .user-mood-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border-subtle);
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+      user-select: none;
+    }
+    .user-mood-btn:hover {
+      background: rgba(255, 209, 102, 0.15);
+      border-color: rgba(255, 209, 102, 0.4);
+    }
+    .user-mood-btn:active { transform: scale(0.92); }
+
+    .mood-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .mood-icon-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border-subtle);
+      border-radius: 14px;
+      padding: 10px 4px;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mood-icon-btn:hover {
+      background: rgba(255, 209, 102, 0.18);
+      border-color: rgba(255, 209, 102, 0.45);
+      transform: translateY(-2px);
+    }
+    .mood-icon-btn:active {
+      transform: scale(0.92);
+    }
+
     /* Main Container (Scroll locked inside view) */
     .app-main {
       flex: 1;
@@ -940,15 +987,15 @@
         <span class="brand-title">Lunar</span>
       </div>
 
-      <!-- Header Debt Badge -->
-      <div id="hdr-debt-badge" class="header-debt-badge" onclick="switchView('balance')">
-        ⚖️ เสมอกัน ฿0
-      </div>
-
-      <!-- Active User Display (แตะเพื่อดูยอดจ่ายสะสม - Requirement 6) -->
-      <div class="user-pill-btn" onclick="openUserStatsModal()" title="แตะเพื่อดูยอดจ่ายสะสม">
-        <span id="hdr-user-avatar">🎅🏻</span>
-        <span id="hdr-user-name">บอส</span>
+      <!-- User Mood Status & Active User Display (Requirement 6 & 7) -->
+      <div style="display:flex; align-items:center; gap:6px;">
+        <div class="user-mood-btn" id="btn-user-mood" onclick="openMoodPickerModal()" title="แตะเพื่อเลือกสถานะ/อารมณ์">
+          <span id="hdr-user-mood">🥰</span>
+        </div>
+        <div class="user-pill-btn" onclick="openUserStatsModal()" title="แตะเพื่อดูยอดจ่ายสะสม">
+          <span id="hdr-user-avatar">🎅🏻</span>
+          <span id="hdr-user-name">บอส</span>
+        </div>
       </div>
     </header>
 
@@ -1067,23 +1114,7 @@
           <div class="balance-desc" id="hero-debt-desc">เคลียร์ครบแล้ว ไม่มีใครติดค้าง 🎉</div>
         </div>
 
-        <!-- Paid Stats Comparison -->
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="glass-card" style="text-align: center;">
-            <div style="font-size: 26px;" id="stat-u1-avatar">🧑‍🦱</div>
-            <div style="font-size: 13px; font-weight:700;" id="stat-u1-name">บอส</div>
-            <div style="font-size: 16px; font-weight:700; color:var(--lunar-gold); margin-top:2px;" id="stat-u1-amt">฿0</div>
-            <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
-          </div>
-          <div class="glass-card" style="text-align: center;">
-            <div style="font-size: 26px;" id="stat-u2-avatar">👩‍🦰</div>
-            <div style="font-size: 13px; font-weight:700;" id="stat-u2-name">คู่หู</div>
-            <div style="font-size: 16px; font-weight:700; color:var(--lunar-gold); margin-top:2px;" id="stat-u2-amt">฿0</div>
-            <div style="font-size: 10px; color:var(--text-muted);">ยอดจ่ายสะสม</div>
-          </div>
-        </div>
-
-        <!-- Action Buttons: เคลียร์หนี้ & ทวงหนี้ (Item 3) -->
+        <!-- Action Buttons: เคลียร์หนี้ & ทวงหนี้ -->
         <div style="display:flex; gap:8px;">
           <button type="button" class="btn-add-batch" onclick="openSettleModal()" style="flex:1; padding: 12px; font-size: 14px;">
             <span>💸</span> <span>เคลียร์หนี้</span>
@@ -1091,6 +1122,17 @@
           <button type="button" class="btn-add-batch" onclick="triggerNudgeDebt()" style="flex:1; padding: 12px; font-size: 14px; background: rgba(255, 107, 107, 0.16); border: 1px solid rgba(255, 107, 107, 0.45); color: #FF8787;">
             <span>🔔</span> <span>ทวงหนี้</span>
           </button>
+        </div>
+
+        <!-- Settle History (Requirement 4) -->
+        <div class="glass-card" style="padding: 10px 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--lunar-gold);">📜 ประวัติการชำระหนี้</span>
+            <span id="settle-history-count" style="font-size: 11px; color: var(--text-muted);">0 รายการ</span>
+          </div>
+          <div id="settle-history-container" style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- Rendered by renderSettleHistory() -->
+          </div>
         </div>
 
         <div class="glass-card" style="display:flex; gap:10px; align-items:center; font-size: 11.5px; color:var(--text-muted); padding: 10px 12px;">
@@ -1267,11 +1309,6 @@
             ✅ ยืนยันบันทึก
           </button>
         </div>
-
-        <!-- ปุ่มทางเลือก: แชร์เข้า LINE ได้ทันที 100% -->
-        <button type="button" class="btn-add-batch" onclick="shareBatchToLineApp()" style="background:#06C755; color:#FFF; padding:10px; font-size:13px; margin-top:4px; box-shadow:0 4px 14px rgba(6,199,85,0.3);">
-          <span>💬</span> <span>แชร์สรุปรายการนี้เข้า LINE ทันที</span>
-        </button>
       </div>
     </div>
 
@@ -1334,7 +1371,7 @@
 
         <!-- ปุ่มส่งยอดไปในไลน์ (Requirement 2 & 10) -->
         <button type="button" class="btn-add-batch" onclick="triggerSendPostSubmitToLine()" style="background:#06C755; color:#FFF; padding:12px; font-size:14.5px; font-weight:700; box-shadow:0 4px 16px rgba(6,199,85,0.4); margin-top:2px;">
-          <span>💬</span> <span>ส่งยอดไปในไลน์ (เปิดแอป)</span>
+          <span>💬</span> <span>ส่งยอดไปในไลน์</span>
         </button>
 
         <!-- ปุ่มเสร็จสิ้น / บันทึกต่อ -->
@@ -1392,6 +1429,41 @@
       </div>
     </div>
 
+    <!-- ========================================================
+         MODAL: เลือกสถานะ / อารมณ์ (Requirement 7)
+         ======================================================== -->
+    <div id="modal-mood-picker" class="modal-backdrop">
+      <div class="bottom-sheet">
+        <div class="modal-head">
+          <span style="color:var(--lunar-gold);">💖 สถานะ & ความรู้สึก</span>
+          <button type="button" class="modal-close-btn" onclick="closeMoodPickerModal()">✕</button>
+        </div>
+
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">
+          แตะเลือกไอคอนเพื่อบอกความรู้สึกให้แฟนรู้:
+        </div>
+
+        <div class="mood-icon-grid">
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥰')" title="รักนะ / หวานใจ"><span>🥰</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('💖')" title="ใจฟู"><span>💖</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥺')" title="อ้อนแฟน"><span>🥺</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😋')" title="หิวแล้ว"><span>😋</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😴')" title="ง่วงนอน"><span>😴</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🥳')" title="อารมณ์ดี"><span>🥳</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('☕')" title="พักผ่อน"><span>☕</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('💸')" title="สายเปย์"><span>💸</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🍽️')" title="กำลังกินข้าว"><span>🍽️</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🛍️')" title="ช็อปปิ้ง"><span>🛍️</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🚗')" title="กำลังเดินทาง"><span>🚗</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🎮')" title="เล่นเกม"><span>🎮</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🤒')" title="ไม่สบาย"><span>🤒</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('😤')" title="งอนอยู่นะ"><span>😤</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🌟')" title="มีความสุข"><span>🌟</span></button>
+          <button type="button" class="mood-icon-btn" onclick="chooseUserMood('🌕')" title="Lunar เต็มดวง"><span>🌕</span></button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ========================================================
@@ -1406,8 +1478,8 @@
 
     // Default configuration
     let appConfig = {
-      user1: { name: 'บอส', avatar: '🎅🏻', pin: '1234' },
-      user2: { name: 'นิว', avatar: '👩‍🦰', pin: '5678' },
+      user1: { name: 'บอส', avatar: '🎅🏻', pin: '1234', mood: '🥰' },
+      user2: { name: 'นิว', avatar: '👩‍🦰', pin: '5678', mood: '🥰' },
       activeUserKey: 'user1',
       gasUrl: DEFAULT_GAS_URL
     };
@@ -1443,6 +1515,8 @@
         if (savedCfg) {
           appConfig = Object.assign(appConfig, JSON.parse(savedCfg));
         }
+        if (!appConfig.user1.mood) appConfig.user1.mood = '🥰';
+        if (!appConfig.user2.mood) appConfig.user2.mood = '🥰';
         // Always ensure latest GAS URL
         appConfig.gasUrl = DEFAULT_GAS_URL;
 
@@ -1638,27 +1712,43 @@
       const active = appConfig[appConfig.activeUserKey];
 
       // Header User Pill
-      document.getElementById('hdr-user-avatar').textContent = active.avatar;
-      document.getElementById('hdr-user-name').textContent = active.name;
+      const hAv = document.getElementById('hdr-user-avatar');
+      if (hAv) hAv.textContent = active.avatar;
+      const hNm = document.getElementById('hdr-user-name');
+      if (hNm) hNm.textContent = active.name;
+
+      // Header User Mood (Requirement 7)
+      const hMood = document.getElementById('hdr-user-mood');
+      if (hMood) hMood.textContent = active.mood || '🥰';
 
       // Recorder Status in Form (หากมี)
       const recEl = document.getElementById('recorder-display-name');
       if (recEl) recEl.textContent = `${active.avatar} ${active.name}`;
 
-      // Stats
-      document.getElementById('stat-u1-avatar').textContent = u1.avatar;
-      document.getElementById('stat-u1-name').textContent = u1.name;
-      document.getElementById('stat-u2-avatar').textContent = u2.avatar;
-      document.getElementById('stat-u2-name').textContent = u2.name;
+      // Stats (if present)
+      const sU1Av = document.getElementById('stat-u1-avatar');
+      if (sU1Av) sU1Av.textContent = u1.avatar;
+      const sU1Nm = document.getElementById('stat-u1-name');
+      if (sU1Nm) sU1Nm.textContent = u1.name;
+      const sU2Av = document.getElementById('stat-u2-avatar');
+      if (sU2Av) sU2Av.textContent = u2.avatar;
+      const sU2Nm = document.getElementById('stat-u2-name');
+      if (sU2Nm) sU2Nm.textContent = u2.name;
 
       // Settings fields
-      document.getElementById('cfg-u1-avatar').value = u1.avatar;
-      document.getElementById('cfg-u1-name').value = u1.name;
-      document.getElementById('cfg-u1-pin').value = u1.pin;
+      const cfgU1Av = document.getElementById('cfg-u1-avatar');
+      if (cfgU1Av) cfgU1Av.value = u1.avatar;
+      const cfgU1Nm = document.getElementById('cfg-u1-name');
+      if (cfgU1Nm) cfgU1Nm.value = u1.name;
+      const cfgU1Pin = document.getElementById('cfg-u1-pin');
+      if (cfgU1Pin) cfgU1Pin.value = u1.pin;
 
-      document.getElementById('cfg-u2-avatar').value = u2.avatar;
-      document.getElementById('cfg-u2-name').value = u2.name;
-      document.getElementById('cfg-u2-pin').value = u2.pin;
+      const cfgU2Av = document.getElementById('cfg-u2-avatar');
+      if (cfgU2Av) cfgU2Av.value = u2.avatar;
+      const cfgU2Nm = document.getElementById('cfg-u2-name');
+      if (cfgU2Nm) cfgU2Nm.value = u2.name;
+      const cfgU2Pin = document.getElementById('cfg-u2-pin');
+      if (cfgU2Pin) cfgU2Pin.value = u2.pin;
     }
 
     /* ========================================================
@@ -1817,9 +1907,9 @@
       const dateStr = items[0].dateStr || getTodayThaiDate();
       const timeStr = items[0].timeStr || "12:00";
 
-      let msg = "Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
+      let msg = "📢Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
       msg += "👤 ผู้บันทึก: " + (active.avatar || "🎅🏻") + " " + active.name + "\n";
-      msg += "📅 วันที่: " + dateStr + " " + timeStr + "\n\n";
+      msg += "📅 วันที่: " + dateStr + " " + timeStr + "\n";
 
       let total = 0;
       items.forEach(it => {
@@ -1828,7 +1918,7 @@
         total += it.amount;
       });
 
-      msg += "\n💰 ยอดรวม: ฿" + total.toLocaleString() + " บาท";
+      msg += "💰 ยอดรวม: ฿" + total.toLocaleString() + " บาท";
       return msg;
     }
 
@@ -1983,8 +2073,10 @@
       const u1 = appConfig.user1;
       const u2 = appConfig.user2;
 
-      document.getElementById('stat-u1-amt').textContent = `฿${u1Paid.toLocaleString()}`;
-      document.getElementById('stat-u2-amt').textContent = `฿${u2Paid.toLocaleString()}`;
+      const sU1Amt = document.getElementById('stat-u1-amt');
+      if (sU1Amt) sU1Amt.textContent = `฿${u1Paid.toLocaleString()}`;
+      const sU2Amt = document.getElementById('stat-u2-amt');
+      if (sU2Amt) sU2Amt.textContent = `฿${u2Paid.toLocaleString()}`;
 
       const hdrBadge = document.getElementById('hdr-debt-badge');
       const heroAmt = document.getElementById('hero-debt-amt');
@@ -1994,17 +2086,17 @@
       const rounded = Math.round(absDebt * 100) / 100;
 
       if (rounded <= 0.01) {
-        hdrBadge.textContent = '⚖️ เสมอกัน ฿0';
+        if (hdrBadge) hdrBadge.textContent = '⚖️ เสมอกัน ฿0';
         heroAmt.textContent = '฿0';
         heroDesc.textContent = 'เคลียร์ครบแล้ว ไม่มีใครติดค้าง 🎉';
       } else if (netDebt > 0) {
         // u2 owes u1
-        hdrBadge.textContent = `${u2.avatar} โอนให้ ${u1.avatar} ฿${rounded.toLocaleString()}`;
+        if (hdrBadge) hdrBadge.textContent = `${u2.avatar} โอนให้ ${u1.avatar} ฿${rounded.toLocaleString()}`;
         heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u2.avatar} ${u2.name} ต้องโอนให้ ${u1.avatar} ${u1.name}`;
       } else {
         // u1 owes u2
-        hdrBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${rounded.toLocaleString()}`;
+        if (hdrBadge) hdrBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${rounded.toLocaleString()}`;
         heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u1.avatar} ${u1.name} ต้องโอนให้ ${u2.avatar} ${u2.name}`;
       }
@@ -2041,6 +2133,7 @@
 
       renderRecentList();
       renderFullHistory();
+      renderSettleHistory();
     }
 
     /* รายการล่าสุด พร้อมไอคอนลบ */
@@ -2273,20 +2366,21 @@
       const debtor = netDebt > 0 ? u2 : u1;
       const creditor = netDebt > 0 ? u1 : u2;
 
-      let msg = "📢 Lunar 🌕— แจ้งเตือนเคลียร์หนี้ \n\n";
-      msg += "ถึงคุณ " + (debtor.avatar || "👩‍🦰") + " " + debtor.name + ":\n";
-      msg += "💸 มียอดค้างชำระอยู่ ฿" + rounded.toLocaleString() + " บาท\n";
+      let msg = "📢 Lunar 🌕— แจ้งเตือนเคลียร์หนี้!\n";
+      msg += "ถึงคุณ " + (debtor.avatar || "👩‍🦰") + " " + debtor.name + " :\n";
+      msg += "💸 มียอดค้างชำระอยู่ " + rounded.toLocaleString() + " บาท\n";
       msg += "📥 โอนให้ " + (creditor.avatar || "🎅🏻") + " " + creditor.name + " แล้วอย่าลืมกดเคลียร์หนี้ในแอปนะ ✨\n";
       msg += "📅 วันที่: " + getTodayThaiDate();
 
-      // ระบุรายการต่างๆ (Requirement 1)
+      // ระบุรายการต่างๆ (ถ้ามี) โดยไม่มีบรรทัดว่างคั่น
       const unsettled = getUnsettledItems();
       if (unsettled.length > 0) {
-        msg += "\n\n📋 รายการค้างชำระ:\n";
+        msg += "\n📋 รายการค้างชำระ:\n";
         unsettled.forEach(it => {
           const title = it.note || it.catName;
           msg += "• " + it.catIcon + " " + title + " : ฿" + it.amount.toLocaleString() + "\n";
         });
+        msg = msg.trimEnd();
       }
 
       sendToLineApp(msg);
@@ -2344,6 +2438,84 @@
     }
 
     /* ========================================================
+       MOOD PICKER (Requirement 7)
+       ======================================================== */
+    function openMoodPickerModal() {
+      document.getElementById('modal-mood-picker').classList.add('active');
+    }
+
+    function closeMoodPickerModal() {
+      document.getElementById('modal-mood-picker').classList.remove('active');
+    }
+
+    function chooseUserMood(icon) {
+      const activeKey = appConfig.activeUserKey;
+      if (!appConfig[activeKey]) return;
+      appConfig[activeKey].mood = icon;
+      saveConfig();
+      applyConfigToUI();
+      closeMoodPickerModal();
+      showToast(`เปลี่ยนสถานะเป็น ${icon} แล้ว ✨`, icon);
+
+      if (appConfig.gasUrl) {
+        fetch(appConfig.gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'saveConfig',
+            config: {
+              user1: appConfig.user1,
+              user2: appConfig.user2
+            }
+          })
+        }).catch(err => console.error('saveMood err:', err));
+      }
+    }
+
+    /* ========================================================
+       SETTLE HISTORY (Requirement 4)
+       ======================================================== */
+    function renderSettleHistory() {
+      const container = document.getElementById('settle-history-container');
+      const countEl = document.getElementById('settle-history-count');
+      if (!container) return;
+
+      const settles = transactions.filter(tx => tx.type === 'settle');
+      if (countEl) countEl.textContent = `${settles.length} รายการ`;
+
+      if (settles.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); font-size: 11.5px; padding: 12px 0;">
+            ยังไม่มีประวัติการชำระหนี้
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      settles.forEach(tx => {
+        const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+        const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+        html += `
+          <div class="recent-row" style="background:rgba(6,214,160,0.08); padding:8px 12px; border-color:rgba(6,214,160,0.25);">
+            <div class="recent-left">
+              <span class="recent-icon">🤝</span>
+              <div>
+                <div class="recent-note" style="color:var(--accent-mint); font-weight:600;">เคลียร์หนี้เรียบร้อย</div>
+                <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${settler.name} โอนให้ ${receiver.name}</div>
+              </div>
+            </div>
+            <div class="recent-right">
+              <span class="recent-amt" style="color:var(--accent-mint); font-weight:700;">฿${tx.amount.toLocaleString()}</span>
+              <button type="button" class="btn-del-item" onclick="deleteTransaction('${tx.id}')" title="ลบรายการ">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    /* ========================================================
        GOOGLE SHEETS / GOOGLE APPS SCRIPT SYNC
        ======================================================== */
     function fetchFromGas(silent = false) {
@@ -2355,8 +2527,8 @@
           if (data && data.status === 'success') {
             // ซิงค์ชื่อและรหัสผู้ใช้งานให้เหมือนกันทุกเครื่อง (Requirement 6)
             if (data.config && typeof data.config === 'object') {
-              if (data.config.user1) appConfig.user1 = data.config.user1;
-              if (data.config.user2) appConfig.user2 = data.config.user2;
+              if (data.config.user1) appConfig.user1 = Object.assign(appConfig.user1, data.config.user1);
+              if (data.config.user2) appConfig.user2 = Object.assign(appConfig.user2, data.config.user2);
               saveConfig();
               applyConfigToUI();
             }
@@ -2413,8 +2585,10 @@
       const u2Avatar = document.getElementById('cfg-u2-avatar').value.trim() || '👩‍🦰';
       const u2Pin = document.getElementById('cfg-u2-pin').value.trim() || '5678';
 
-      appConfig.user1 = { name: u1Name, avatar: u1Avatar, pin: u1Pin };
-      appConfig.user2 = { name: u2Name, avatar: u2Avatar, pin: u2Pin };
+      const u1Mood = appConfig.user1.mood || '🥰';
+      const u2Mood = appConfig.user2.mood || '🥰';
+      appConfig.user1 = { name: u1Name, avatar: u1Avatar, pin: u1Pin, mood: u1Mood };
+      appConfig.user2 = { name: u2Name, avatar: u2Avatar, pin: u2Pin, mood: u2Mood };
       saveConfig();
       applyConfigToUI();
       renderAll();
