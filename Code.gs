@@ -122,7 +122,7 @@ function doPost(e) {
           Logger.log("✅ บันทึก LINE Target ID สำเร็จ: " + targetId);
 
           if (event.replyToken) {
-            replyLineMessage(event.replyToken, "🌙 Lunar เชื่อมต่อกับกลุ่มนี้เรียบร้อยแล้ว!\nระบบจะแจ้งเตือนทุกครั้งที่มีการบันทึกรายจ่ายหรือเคลียร์หนี้ครับ ✨", ss);
+            replyLineMessage(event.replyToken, "🌕 Lunar เชื่อมต่อกับกลุ่มนี้เรียบร้อยแล้ว!\nระบบจะแจ้งเตือนทุกครั้งที่มีการบันทึกรายจ่ายหรือเคลียร์หนี้ครับ ✨", ss);
           }
         }
       });
@@ -154,8 +154,7 @@ function doPost(e) {
         const lastRow = txSheet.getLastRow();
         txSheet.getRange(lastRow + 1, 1, rowsToAdd.length, 12).setValues(rowsToAdd);
 
-        // ส่งการแจ้งเตือนผ่าน LINE
-        notifyLineBatch(items, ss);
+        // ยกเลิกระบบส่งข้อความอัตโนมัติ (ให้ผู้ใช้กดส่งยอดในไลน์ผ่านแอปเอง - Requirement 2)
       }
 
       return createJsonResponse({ status: "success", added: rowsToAdd.length });
@@ -196,9 +195,7 @@ function doPost(e) {
         settleTx.timestamp
       ]);
 
-      // ส่งการแจ้งเตือนผ่าน LINE
-      notifyLineSettle(settleTx, ss);
-
+      // ยกเลิกระบบส่งข้อความอัตโนมัติ (ให้ผู้ใช้กดส่งยอดในไลน์ผ่านแอปเอง - Requirement 2)
       return createJsonResponse({ status: "success", message: "Settled recorded" });
     }
 
@@ -327,7 +324,7 @@ function testLineSendDirect(ss) {
         "Authorization": "Bearer " + token
       },
       payload: JSON.stringify({
-        messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนถึงเพื่อนทุกคนสำเร็จ! (ไม่ต้องสร้างกลุ่ม) ✨" }]
+        messages: [{ type: "text", text: "🌕 Lunar ทดสอบการแจ้งเตือนถึงเพื่อนทุกคนสำเร็จ! (ไม่ต้องสร้างกลุ่ม) ✨" }]
       }),
       muteHttpExceptions: true
     });
@@ -343,7 +340,7 @@ function testLineSendDirect(ss) {
         },
         payload: JSON.stringify({
           to: targetId,
-          messages: [{ type: "text", text: "🌙 Lunar ทดสอบการแจ้งเตือนเข้ากลุ่มสำเร็จ! ✨" }]
+          messages: [{ type: "text", text: "🌕 Lunar ทดสอบการแจ้งเตือนเข้ากลุ่มสำเร็จ! ✨" }]
         }),
         muteHttpExceptions: true
       });
@@ -457,7 +454,7 @@ function notifyLineBatch(items, ss) {
     payerName = "นิว";
   }
 
-  let msg = "🌙 Lunar — บันทึกรายจ่ายใหม่!\n";
+  let msg = "Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
   msg += "👤 ผู้บันทึก: " + payerName + "\n";
   msg += "📅 วันที่: " + (items[0].dateStr || "") + " " + (items[0].timeStr || "") + "\n\n";
   

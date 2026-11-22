@@ -561,6 +561,49 @@
     }
     .btn-del-item:active { background: rgba(255, 107, 107, 0.3); }
 
+    /* Lunar Mascot Mood Card (Requirement 4 & 5) */
+    .mascot-mood-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 209, 102, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(255, 209, 102, 0.12);
+      animation: fadeIn 0.25s ease-out;
+    }
+    .mascot-moon-avatar {
+      font-size: 34px;
+      line-height: 1;
+      filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.6));
+      animation: moonFloat 3s ease-in-out infinite alternate;
+      flex-shrink: 0;
+    }
+    @keyframes moonFloat {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-3px) scale(1.05); }
+    }
+    .mascot-text-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .mascot-mood-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--lunar-gold);
+      letter-spacing: 0.3px;
+    }
+    .mascot-mood-desc {
+      font-size: 11.5px;
+      color: var(--text-white);
+      line-height: 1.35;
+    }
+
     /* Settlement Hero Card */
     .balance-hero {
       background: linear-gradient(135deg, rgba(255, 209, 102, 0.15) 0%, rgba(22, 26, 38, 0.8) 100%);
@@ -902,11 +945,10 @@
         ⚖️ เสมอกัน ฿0
       </div>
 
-      <!-- Active User Display & Lock Screen Button -->
-      <div class="user-pill-btn" onclick="lockAppScreen()" title="กดเพื่อล็อกหน้าจอหรือเปลี่ยนผู้ใช้">
-        <span id="hdr-user-avatar">🧑‍🦱</span>
+      <!-- Active User Display (แตะเพื่อดูยอดจ่ายสะสม - Requirement 6) -->
+      <div class="user-pill-btn" onclick="openUserStatsModal()" title="แตะเพื่อดูยอดจ่ายสะสม">
+        <span id="hdr-user-avatar">🎅🏻</span>
         <span id="hdr-user-name">บอส</span>
-        <span style="font-size: 11px; opacity: 0.7;">🔒</span>
       </div>
     </header>
 
@@ -1009,6 +1051,15 @@
       <!-- ================= VIEW 2: BALANCE & SETTLE ================= -->
       <section id="view-balance" class="view-section">
         
+        <!-- Lunar Mascot Mood (Requirement 4 & 5) -->
+        <div class="mascot-mood-card">
+          <div class="mascot-moon-avatar" id="mascot-moon-icon">🌕</div>
+          <div class="mascot-text-box">
+            <div class="mascot-mood-title" id="mascot-mood-title">Lunar Mood: สดใสเต็มดวง ✨</div>
+            <div class="mascot-mood-desc" id="mascot-mood-desc">เคลียร์ครบแล้ว ไม่มีใครติดค้าง รักกันหวานชื่น 💛</div>
+          </div>
+        </div>
+
         <!-- Settle Hero Card -->
         <div class="balance-hero">
           <div class="balance-title">ยอดหนี้สุทธิที่ต้องเคลียร์</div>
@@ -1066,17 +1117,17 @@
       <!-- ================= VIEW 4: SETTINGS & SYNC ================= -->
       <section id="view-settings" class="view-section">
         
-        <!-- User Names & PINs Setup (ซิงค์ทุกเครื่องให้ใช้รหัสเดียวกัน) -->
+        <!-- User Names & PINs Setup (Requirement 8) -->
         <div class="glass-card">
           <div style="font-size: 13px; font-weight: 700; color: var(--lunar-gold); margin-bottom: 8px;">
-            ⚙️ ข้อมูลผู้ใช้งาน & รหัส PIN (ซิงค์ทุกเครื่อง)
+            ⚙️ ข้อมูลผู้ใช้งาน & รหัส PIN
           </div>
 
           <!-- User 1 -->
           <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--glass-border-subtle);">
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">ผู้ใช้งาน 1 (User 1)</div>
             <div style="display:flex; gap: 8px;">
-              <input type="text" id="cfg-u1-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="🧑‍🦱">
+              <input type="text" id="cfg-u1-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="🎅🏻">
               <input type="text" id="cfg-u1-name" class="note-input-ctrl" placeholder="ชื่อเล่น" value="บอส">
               <input type="password" id="cfg-u1-pin" class="note-input-ctrl" placeholder="PIN" maxlength="4" style="max-width: 80px; text-align: center;" value="1234">
             </div>
@@ -1087,7 +1138,7 @@
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">ผู้ใช้งาน 2 (User 2)</div>
             <div style="display:flex; gap: 8px;">
               <input type="text" id="cfg-u2-avatar" class="note-input-ctrl" style="max-width: 48px; text-align: center;" value="👩‍🦰">
-              <input type="text" id="cfg-u2-name" class="note-input-ctrl" placeholder="ชื่อเล่น" value="คู่หู">
+              <input type="text" id="cfg-u2-name" class="note-input-ctrl" placeholder="ชื่อเล่น" value="นิว">
               <input type="password" id="cfg-u2-pin" class="note-input-ctrl" placeholder="PIN" maxlength="4" style="max-width: 80px; text-align: center;" value="5678">
             </div>
           </div>
@@ -1097,9 +1148,9 @@
           </button>
         </div>
 
-        <!-- Logout / Relock -->
+        <!-- Logout / Relock (Requirement 7) -->
         <button type="button" class="btn-add-batch" onclick="lockAppScreen()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
-          <span>🔒</span> <span>ล็อกหน้าจอ (กลับหน้า PIN)</span>
+          <span>🔒</span> <span>ล็อกหน้าจอ</span>
         </button>
 
       </section>
@@ -1261,6 +1312,86 @@
       </div>
     </div>
 
+    <!-- ========================================================
+         MODAL: ส่งยอดเข้า LINE หลังบันทึก (Requirement 2, 3, 10)
+         ======================================================== -->
+    <div id="modal-post-submit" class="modal-backdrop">
+      <div class="bottom-sheet">
+        <div class="modal-head">
+          <span style="color:var(--accent-mint);">🎉 บันทึกข้อมูลเรียบร้อยแล้ว</span>
+          <button type="button" class="modal-close-btn" onclick="closePostSubmitModal()">✕</button>
+        </div>
+
+        <div style="text-align:center; padding:8px 0;">
+          <div style="font-size:38px; margin-bottom:4px;">🌕✨</div>
+          <div style="font-size:14px; font-weight:700; color:#FFF;" id="post-submit-summary-txt">
+            บันทึกสำเร็จเรียบร้อย
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+            แตะปุ่มด้านล่างเพื่อส่งสรุปยอดไปในแอป LINE ให้คู่หู
+          </div>
+        </div>
+
+        <!-- ปุ่มส่งยอดไปในไลน์ (Requirement 2 & 10) -->
+        <button type="button" class="btn-add-batch" onclick="triggerSendPostSubmitToLine()" style="background:#06C755; color:#FFF; padding:12px; font-size:14.5px; font-weight:700; box-shadow:0 4px 16px rgba(6,199,85,0.4); margin-top:2px;">
+          <span>💬</span> <span>ส่งยอดไปในไลน์ (เปิดแอป)</span>
+        </button>
+
+        <!-- ปุ่มเสร็จสิ้น / บันทึกต่อ -->
+        <button type="button" class="btn-add-batch" onclick="closePostSubmitModal()" style="background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle); padding:10px; font-size:13px; margin-top:2px;">
+          <span>✅</span> <span>เรียบร้อย (ทำรายการต่อ)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL: ยอดจ่ายสะสมของผู้ใช้งาน (Requirement 6)
+         ======================================================== -->
+    <div id="modal-user-stats" class="modal-backdrop">
+      <div class="bottom-sheet">
+        <div class="modal-head">
+          <span>📊 ข้อมูลยอดจ่ายสะสม</span>
+          <button type="button" class="modal-close-btn" onclick="closeUserStatsModal()">✕</button>
+        </div>
+
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:2px;">
+          สรุปยอดเงินที่แต่ละคนจ่ายสะสมไปทั้งหมด:
+        </div>
+
+        <!-- 2 User Stat Cards -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="glass-card" style="text-align: center; padding: 12px 8px;">
+            <div style="font-size: 30px;" id="u-stats-u1-avatar">🎅🏻</div>
+            <div style="font-size: 14px; font-weight:700; margin-top:2px;" id="u-stats-u1-name">บอส</div>
+            <div style="font-size: 18px; font-weight:700; color:var(--lunar-gold); margin-top:4px;" id="u-stats-u1-amt">฿0</div>
+            <div style="font-size: 10.5px; color:var(--text-muted);" id="u-stats-u1-count">0 รายการ</div>
+          </div>
+          <div class="glass-card" style="text-align: center; padding: 12px 8px;">
+            <div style="font-size: 30px;" id="u-stats-u2-avatar">👩‍🦰</div>
+            <div style="font-size: 14px; font-weight:700; margin-top:2px;" id="u-stats-u2-name">นิว</div>
+            <div style="font-size: 18px; font-weight:700; color:var(--lunar-gold); margin-top:4px;" id="u-stats-u2-amt">฿0</div>
+            <div style="font-size: 10.5px; color:var(--text-muted);" id="u-stats-u2-count">0 รายการ</div>
+          </div>
+        </div>
+
+        <!-- Overall Summary -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(255,209,102,0.08); border-radius:14px; border:1px solid rgba(255,209,102,0.3);">
+          <span style="font-size:12.5px; font-weight:600;">ยอดจ่ายรวมทั้งคู่:</span>
+          <span id="u-stats-total-all" style="font-size:16px; font-weight:700; color:var(--lunar-gold);">฿0</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button type="button" class="btn-add-batch" onclick="switchActiveUserModal()" style="flex:1; padding:9px; font-size:12.5px; background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
+            <span>🔄</span> <span>สลับผู้ใช้</span>
+          </button>
+          <button type="button" class="btn-add-batch" onclick="closeUserStatsModal(); lockAppScreen();" style="flex:1; padding:9px; font-size:12.5px; background:rgba(255,255,255,0.08); color:var(--text-white); border:1px solid var(--glass-border-subtle);">
+            <span>🔒</span> <span>ล็อกหน้าจอ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ========================================================
@@ -1271,12 +1402,12 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycby6j6R53AaDoJWZd6_RCcDiTa1mNuWRl0a4JfENE3s0FiKgZ2jC6wWk4QnAr7tSWh73/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzcdT7eVZ_fMuSL_KVDKdyutTEmunwJR3UndGCmc1Xwz1bovSPloPqJaTrSKIzRTN2V/exec';
 
     // Default configuration
     let appConfig = {
-      user1: { name: 'บอส', avatar: '🧑‍🦱', pin: '1234' },
-      user2: { name: 'คู่หู', avatar: '👩‍🦰', pin: '5678' },
+      user1: { name: 'บอส', avatar: '🎅🏻', pin: '1234' },
+      user2: { name: 'นิว', avatar: '👩‍🦰', pin: '5678' },
       activeUserKey: 'user1',
       gasUrl: DEFAULT_GAS_URL
     };
@@ -1417,7 +1548,7 @@
       updatePinDots();
 
       const user = appConfig[userKey];
-      showToast(`🌙 ยินดีต้อนรับ คุณ${user.name}`, '👋');
+      showToast(`🌕 ยินดีต้อนรับ คุณ${user.name}`, '👋');
     }
 
     function lockAppScreen() {
@@ -1675,26 +1806,55 @@
       document.getElementById('modal-batch-confirm').classList.add('active');
     }
 
-    function shareBatchToLineApp() {
-      if (batchQueue.length === 0) return;
-      const active = appConfig[appConfig.activeUserKey];
-      const dateStr = document.getElementById('date-display').value || getTodayThaiDate();
-      const timeStr = document.getElementById('time-input').value || '12:00';
+    /* ========================================================
+       LINE SHARING & POST-SUBMIT MODAL (Requirement 2, 3, 10)
+       ======================================================== */
+    let latestSavedBatch = [];
 
-      let msg = "🌙 Lunar — บันทึกรายจ่ายใหม่!\n";
-      msg += "👤 ผู้บันทึก: " + (active.avatar || "🧑‍🦱") + " " + active.name + "\n";
+    function buildBatchLineMessage(items) {
+      if (!items || items.length === 0) return "";
+      const active = appConfig[appConfig.activeUserKey];
+      const dateStr = items[0].dateStr || getTodayThaiDate();
+      const timeStr = items[0].timeStr || "12:00";
+
+      let msg = "Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
+      msg += "👤 ผู้บันทึก: " + (active.avatar || "🎅🏻") + " " + active.name + "\n";
       msg += "📅 วันที่: " + dateStr + " " + timeStr + "\n\n";
 
       let total = 0;
-      batchQueue.forEach(it => {
-        const splitText = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
-        msg += "• " + it.catIcon + " " + it.note + " : ฿" + it.amount.toLocaleString() + " (" + splitText + ")\n";
+      items.forEach(it => {
+        const itemTitle = it.note || it.catName;
+        msg += "• " + it.catIcon + " " + itemTitle + " : ฿" + it.amount.toLocaleString() + "\n";
         total += it.amount;
       });
-      msg += "\n💰 ยอดรวม: ฿" + total.toLocaleString() + " บาท";
 
-      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
-      window.open(lineUrl, '_blank');
+      msg += "\n💰 ยอดรวม: ฿" + total.toLocaleString() + " บาท";
+      return msg;
+    }
+
+    function sendToLineApp(msg) {
+      // ปิด modal ทั้งหมดเพื่อให้เด้งกลับหน้าจอทำงานอัตโนมัติ ไม่ค้างหน้าจอขาว (Requirement 3)
+      closePostSubmitModal();
+      closeBatchConfirmModal();
+      closeSettleModal();
+      closeUserStatsModal();
+
+      const encoded = encodeURIComponent(msg);
+      const lineUrl = "https://line.me/R/msg/text/?" + encoded;
+
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        // ใช้ location.href ในหน้าเดิม เพื่อเปิดแอป LINE ทันทีโดยไม่เปิดแท็บเปล่าค้างหน้าขาว
+        window.location.href = lineUrl;
+      } else {
+        window.open(lineUrl, '_blank');
+      }
+    }
+
+    function shareBatchToLineApp() {
+      if (batchQueue.length === 0) return;
+      const msg = buildBatchLineMessage(batchQueue);
+      sendToLineApp(msg);
     }
 
     function shareSettleToLineApp() {
@@ -1707,22 +1867,45 @@
       const inputEl = document.getElementById('in-settle-amt');
       const amt = (inputEl && parseFloat(inputEl.value)) ? parseFloat(inputEl.value) : rounded;
 
-      let msg = "🤝 Lunar — เคลียร์หนี้เรียบร้อยแล้ว!\n";
+      let msg = "🤝 Lunar 🌕 — เคลียร์หนี้เรียบร้อยแล้ว!\n";
       msg += "💸 ยอดโอนเคลียร์: ฿" + amt.toLocaleString() + " บาท\n";
       msg += "📤 ผู้โอน: " + payer.avatar + " " + payer.name + "\n";
       msg += "📥 ผู้รับ: " + receiver.avatar + " " + receiver.name + "\n";
       msg += "📅 วันที่: " + getTodayThaiDate() + "\n";
       msg += "🎉 สถานะ: ปรับยอดหนี้คงค้างเป็น 0 เรียบร้อย!";
 
-      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
-      window.open(lineUrl, '_blank');
+      sendToLineApp(msg);
     }
 
     function closeBatchConfirmModal() {
       document.getElementById('modal-batch-confirm').classList.remove('active');
     }
 
-    /* ยืนยันบันทึกข้อมูลทั้งหมด (Requirement 3 & 4) */
+    function openPostSubmitModal(items) {
+      latestSavedBatch = items || [];
+      const count = latestSavedBatch.length;
+      const total = latestSavedBatch.reduce((sum, it) => sum + it.amount, 0);
+      const sumEl = document.getElementById('post-submit-summary-txt');
+      if (sumEl) {
+        sumEl.textContent = `บันทึกสำเร็จ ${count} รายการ ยอดรวม ฿${total.toLocaleString('th-TH')}`;
+      }
+      document.getElementById('modal-post-submit').classList.add('active');
+    }
+
+    function closePostSubmitModal() {
+      document.getElementById('modal-post-submit').classList.remove('active');
+    }
+
+    function triggerSendPostSubmitToLine() {
+      if (!latestSavedBatch || latestSavedBatch.length === 0) {
+        closePostSubmitModal();
+        return;
+      }
+      const msg = buildBatchLineMessage(latestSavedBatch);
+      sendToLineApp(msg);
+    }
+
+    /* ยืนยันบันทึกข้อมูลทั้งหมด (Requirement 2, 3, 10) */
     function executeSubmitBatch() {
       if (batchQueue.length === 0) return;
 
@@ -1758,9 +1941,10 @@
       renderAll();
       closeBatchConfirmModal();
 
-      showToast(`🎉 บันทึกสำเร็จ ${count} รายการ!`, '🚀');
+      // แสดงหน้าต่างพร้อมปุ่มส่งยอดไปในไลน์ (Requirement 2 & 10)
+      openPostSubmitModal(newItems);
 
-      // Sync with Google Sheets
+      // ซิงค์เข้า Google Sheets โดยไม่ส่งข้อความอัตโนมัติซ้ำ (Requirement 2)
       if (appConfig.gasUrl) {
         sendBatchToGas(newItems);
       }
@@ -1823,6 +2007,36 @@
         hdrBadge.textContent = `${u1.avatar} โอนให้ ${u2.avatar} ฿${rounded.toLocaleString()}`;
         heroAmt.textContent = `฿${rounded.toLocaleString()}`;
         heroDesc.textContent = `${u1.avatar} ${u1.name} ต้องโอนให้ ${u2.avatar} ${u2.name}`;
+      }
+
+      // Lunar Mascot Mood Update (Requirement 4 & 5)
+      const mascotIcon = document.getElementById('mascot-moon-icon');
+      const mascotTitle = document.getElementById('mascot-mood-title');
+      const mascotDesc = document.getElementById('mascot-mood-desc');
+      if (mascotIcon && mascotTitle && mascotDesc) {
+        mascotIcon.textContent = '🌕';
+        if (rounded <= 0.01) {
+          mascotTitle.textContent = 'Lunar Mood: สดใสเต็มดวง ✨';
+          mascotDesc.textContent = 'เคลียร์ครบแล้ว ไม่มีใครติดค้าง รักกันหวานชื่น 💛';
+        } else if (netDebt > 0) {
+          // u2 owes u1
+          if (appConfig.activeUserKey === 'user2') {
+            mascotTitle.textContent = 'Lunar Mood: พระจันทร์สะกิดเตือน 💫';
+            mascotDesc.textContent = `มียอดค้างชำระ ฿${rounded.toLocaleString()} โอนคืนให้ ${u1.name} แล้วอย่าลืมเคลียร์หนี้นะจ๊ะ 💸`;
+          } else {
+            mascotTitle.textContent = 'Lunar Mood: พระจันทร์พร้อมทวง 🔔';
+            mascotDesc.textContent = `มีเงินรอเข้ากระเป๋า ฿${rounded.toLocaleString()} จาก ${u2.name} กดทวงหนี้สะกิดแฟนได้เลย!`;
+          }
+        } else {
+          // u1 owes u2
+          if (appConfig.activeUserKey === 'user1') {
+            mascotTitle.textContent = 'Lunar Mood: พระจันทร์สะกิดเตือน 💫';
+            mascotDesc.textContent = `มียอดค้างชำระ ฿${rounded.toLocaleString()} โอนคืนให้ ${u2.name} แล้วอย่าลืมเคลียร์หนี้นะจ๊ะ 💸`;
+          } else {
+            mascotTitle.textContent = 'Lunar Mood: พระจันทร์พร้อมทวง 🔔';
+            mascotDesc.textContent = `มีเงินรอเข้ากระเป๋า ฿${rounded.toLocaleString()} จาก ${u1.name} กดทวงหนี้สะกิดแฟนได้เลย!`;
+          }
+        }
       }
 
       renderRecentList();
@@ -2031,8 +2245,20 @@
     }
 
     /* ========================================================
-       NUDGE DEBT / ทวงหนี้ (Item 3)
+       NUDGE DEBT / ทวงหนี้ (Requirement 1, 3, 5, 9)
        ======================================================== */
+    function getUnsettledItems() {
+      const items = [];
+      for (let i = 0; i < transactions.length; i++) {
+        const tx = transactions[i];
+        if (tx.type === 'settle') break;
+        if (tx.type === 'expense') {
+          items.push(tx);
+        }
+      }
+      return items.reverse();
+    }
+
     function triggerNudgeDebt() {
       const { netDebt } = calculateDebt();
       const rounded = Math.round(Math.abs(netDebt) * 100) / 100;
@@ -2047,29 +2273,74 @@
       const debtor = netDebt > 0 ? u2 : u1;
       const creditor = netDebt > 0 ? u1 : u2;
 
-      let msg = "📢 Lunar — สะกิดเตือนเคลียร์หนี้ 🌙\n\n";
-      msg += "ถึงคุณ " + debtor.avatar + " " + debtor.name + ":\n";
+      let msg = "📢 Lunar 🌕— แจ้งเตือนเคลียร์หนี้ \n\n";
+      msg += "ถึงคุณ " + (debtor.avatar || "👩‍🦰") + " " + debtor.name + ":\n";
       msg += "💸 มียอดค้างชำระอยู่ ฿" + rounded.toLocaleString() + " บาท\n";
-      msg += "📥 โอนให้ " + creditor.avatar + " " + creditor.name + " แล้วอย่าลืมกดเคลียร์หนี้ในแอปนะจ๊ะ ✨\n";
+      msg += "📥 โอนให้ " + (creditor.avatar || "🎅🏻") + " " + creditor.name + " แล้วอย่าลืมกดเคลียร์หนี้ในแอปนะ ✨\n";
       msg += "📅 วันที่: " + getTodayThaiDate();
 
-      // ส่ง Notification เข้า LINE ผ่าน Google Apps Script backend (ทั้ง Broadcast หาเพื่อนทุกคน และ Push เข้ากลุ่ม)
-      if (appConfig.gasUrl) {
-        fetch(appConfig.gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'nudgeDebt',
-            message: msg
-          })
-        }).catch(err => console.log('Nudge GAS error:', err));
+      // ระบุรายการต่างๆ (Requirement 1)
+      const unsettled = getUnsettledItems();
+      if (unsettled.length > 0) {
+        msg += "\n\n📋 รายการค้างชำระ:\n";
+        unsettled.forEach(it => {
+          const title = it.note || it.catName;
+          msg += "• " + it.catIcon + " " + title + " : ฿" + it.amount.toLocaleString() + "\n";
+        });
       }
 
-      showToast('🔔 ส่งการแจ้งเตือนทวงหนี้เรียบร้อย!', '📢');
+      sendToLineApp(msg);
+      showToast('🔔 เปิด LINE ส่งข้อความทวงหนี้แล้ว', '📢');
+    }
 
-      // เปิดแอป LINE 1-Tap ส่งให้เพื่อนได้ทันที
-      const lineUrl = "https://line.me/R/msg/text/?" + encodeURIComponent(msg);
-      window.open(lineUrl, '_blank');
+    /* ========================================================
+       USER STATS MODAL (Requirement 6)
+       ======================================================== */
+    function openUserStatsModal() {
+      const u1 = appConfig.user1;
+      const u2 = appConfig.user2;
+
+      let u1Paid = 0, u1Count = 0;
+      let u2Paid = 0, u2Count = 0;
+
+      transactions.forEach(tx => {
+        if (tx.type === 'expense') {
+          if (tx.payerKey === 'user1') {
+            u1Paid += tx.amount;
+            u1Count++;
+          } else if (tx.payerKey === 'user2') {
+            u2Paid += tx.amount;
+            u2Count++;
+          }
+        }
+      });
+
+      document.getElementById('u-stats-u1-avatar').textContent = u1.avatar;
+      document.getElementById('u-stats-u1-name').textContent = u1.name;
+      document.getElementById('u-stats-u1-amt').textContent = `฿${u1Paid.toLocaleString()}`;
+      document.getElementById('u-stats-u1-count').textContent = `${u1Count} รายการ`;
+
+      document.getElementById('u-stats-u2-avatar').textContent = u2.avatar;
+      document.getElementById('u-stats-u2-name').textContent = u2.name;
+      document.getElementById('u-stats-u2-amt').textContent = `฿${u2Paid.toLocaleString()}`;
+      document.getElementById('u-stats-u2-count').textContent = `${u2Count} รายการ`;
+
+      document.getElementById('u-stats-total-all').textContent = `฿${(u1Paid + u2Paid).toLocaleString()}`;
+
+      document.getElementById('modal-user-stats').classList.add('active');
+    }
+
+    function closeUserStatsModal() {
+      document.getElementById('modal-user-stats').classList.remove('active');
+    }
+
+    function switchActiveUserModal() {
+      appConfig.activeUserKey = (appConfig.activeUserKey === 'user1') ? 'user2' : 'user1';
+      saveConfig();
+      applyConfigToUI();
+      closeUserStatsModal();
+      const active = appConfig[appConfig.activeUserKey];
+      showToast(`สลับเป็น ${active.avatar} ${active.name} แล้ว`, '🔄');
     }
 
     /* ========================================================
@@ -2163,7 +2434,7 @@
         }).catch(err => console.error('saveConfig err:', err));
       }
 
-      showToast('บันทึกและซิงค์รหัส PIN ไปยังทุกเครื่องแล้ว! 🌙', '💾');
+      showToast('บันทึกข้อมูลและรหัส PIN เรียบร้อยแล้ว! 🌕', '💾');
     }
 
     function confirmClearHistory() {
