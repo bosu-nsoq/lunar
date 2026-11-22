@@ -532,7 +532,8 @@ function notifyLineBatch(items, ss) {
     payerName = "นิว";
   }
 
-  let msg = "Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
+  let msg = "Lunar 🌕📢\n";
+  msg += "บันทึกรายจ่ายใหม่!\n";
   msg += "👤 ผู้บันทึก: " + payerName + "\n";
   msg += "📅 วันที่: " + (items[0].dateStr || "") + " " + (items[0].timeStr || "") + "\n\n";
   

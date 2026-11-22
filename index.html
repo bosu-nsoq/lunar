@@ -2025,15 +2025,15 @@
       const dateStr = items[0].dateStr || getTodayThaiDate();
       const timeStr = items[0].timeStr || "12:00";
 
-      let msg = "📢Lunar 🌕  — บันทึกรายจ่ายใหม่!\n";
+      let msg = "Lunar 🌕📢\n";
+      msg += "บันทึกรายจ่ายใหม่!\n";
       msg += "👤 ผู้บันทึก: " + (active.avatar || "🎅🏻") + " " + active.name + "\n";
       msg += "📅 วันที่: " + dateStr + " " + timeStr + "\n";
 
       let total = 0;
       items.forEach(it => {
         const itemTitle = it.note || it.catName;
-        const splitTag = (it.splitMode === 'half' && !itemTitle.includes('คนละครึ่ง')) ? ' (คนละครึ่ง)' : '';
-        msg += "• " + it.catIcon + " " + itemTitle + splitTag + " : ฿" + it.amount.toLocaleString() + "\n";
+        msg += "• " + it.catIcon + " " + itemTitle + " : ฿" + it.amount.toLocaleString() + "\n";
         total += it.amount;
       });
 
@@ -2610,7 +2610,8 @@
       const debtor = netDebt > 0 ? u2 : u1;
       const creditor = netDebt > 0 ? u1 : u2;
 
-      let msg = "📢 Lunar 🌕— แจ้งเตือนเคลียร์หนี้!\n";
+      let msg = "Lunar 🌕📢\n";
+      msg += "แจ้งเตือนเคลียร์หนี้!\n";
       msg += "ถึงคุณ " + (debtor.avatar || "👩‍🦰") + " " + debtor.name + " :\n";
       msg += "💸 มียอดค้างชำระอยู่ " + rounded.toLocaleString() + " บาท\n";
       msg += "📥 โอนให้ " + (creditor.avatar || "🎅🏻") + " " + creditor.name + " แล้วอย่าลืมกดเคลียร์หนี้ในแอปนะ ✨\n";
