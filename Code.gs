@@ -191,13 +191,15 @@ function doPost(e) {
     if (action === "settleDebt") {
       const settleTx = postData.tx;
       const txSheet = ss.getSheetByName(SHEET_TX_NAME);
+      const settlerKey = settleTx.settlerKey || settleTx.payerKey || "";
+      const receiverKey = settleTx.receiverKey || "";
       txSheet.appendRow([
         settleTx.id,
         settleTx.dateStr,
         settleTx.timeStr,
         "settle",
-        settleTx.settlerKey,
-        settleTx.receiverKey,
+        settlerKey,
+        receiverKey,
         "🤝",
         "เคลียร์หนี้",
         settleTx.amount,
@@ -237,13 +239,35 @@ function getTransactionsData(ss) {
   const list = [];
   for (let i = rows.length - 1; i >= 1; i--) {
     const r = rows[i];
+    let timeStr = r[2];
+    if (timeStr instanceof Date) {
+      const hh = String(timeStr.getHours()).padStart(2, '0');
+      const mm = String(timeStr.getMinutes()).padStart(2, '0');
+      timeStr = hh + ":" + mm;
+    } else if (typeof timeStr === 'string' && timeStr.includes('T')) {
+      try {
+        const d = new Date(timeStr);
+        if (!isNaN(d.getTime())) {
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mm = String(d.getMinutes()).padStart(2, '0');
+          timeStr = hh + ":" + mm;
+        }
+      } catch (e) {}
+    }
+
+    const type = r[3] || 'expense';
+    const payerKey = r[4] || '';
+    const receiverKey = r[5] || '';
+    const settlerKey = (type === 'settle') ? payerKey : undefined;
+
     list.push({
       id: r[0],
       dateStr: r[1],
-      timeStr: r[2],
-      type: r[3],
-      payerKey: r[4],
-      receiverKey: r[5],
+      timeStr: String(timeStr || ''),
+      type: type,
+      payerKey: payerKey,
+      settlerKey: settlerKey,
+      receiverKey: receiverKey,
       catIcon: r[6],
       catName: r[7],
       amount: parseFloat(r[8]) || 0,

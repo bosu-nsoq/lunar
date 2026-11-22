@@ -1522,7 +1522,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwcEskU8ytRtQUTiCXG64gPdqHCC3g8h6DZbVBQoIjk_DxZeRMfyeoXCNYMw7Pwdz4/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxHLULftoTSPBjWH7rusmId1V6fm8S_V1O4V60hMaEj9ndovQ9c9oB7MrawVdvsHRLU/exec';
 
     // Default configuration
     let appConfig = {
@@ -1579,7 +1579,21 @@
 
         const savedItems = localStorage.getItem(STORAGE_KEY_ITEMS);
         if (savedItems) {
-          transactions = JSON.parse(savedItems);
+          try {
+            transactions = JSON.parse(savedItems);
+            if (Array.isArray(transactions)) {
+              transactions = transactions.map(t => {
+                if (t.type === 'settle' && !t.settlerKey) {
+                  t.settlerKey = t.payerKey;
+                }
+                return t;
+              });
+            } else {
+              transactions = [];
+            }
+          } catch (e) {
+            transactions = [];
+          }
         } else {
           transactions = [
             {
@@ -2067,12 +2081,29 @@
        ======================================================== */
     let latestSettleTx = null;
 
+    function formatTimeStr(val) {
+      if (!val) return '';
+      if (typeof val === 'string' && val.includes('T')) {
+        try {
+          const d = new Date(val);
+          if (!isNaN(d.getTime())) {
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            return `${hh}:${mm}`;
+          }
+        } catch (e) {}
+      }
+      return String(val);
+    }
+
     function buildSettleLineMessage(tx) {
       if (!tx) return "";
-      const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
-      const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+      const settlerKey = tx.settlerKey || tx.payerKey;
+      const receiverKey = tx.receiverKey || (settlerKey === 'user1' ? 'user2' : 'user1');
+      const settler = appConfig[settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+      const receiver = appConfig[receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
       const dateStr = tx.dateStr || getTodayThaiDate();
-      const timeStr = tx.timeStr || "";
+      const timeStr = formatTimeStr(tx.timeStr);
 
       let msg = "🤝 Lunar 🌕 — เคลียร์หนี้เรียบร้อยแล้ว!\n";
       msg += "💸 ยอดโอนเคลียร์: ฿" + (tx.amount || 0).toLocaleString() + " บาท\n";
@@ -2162,18 +2193,25 @@
 
       transactions.forEach(tx => {
         if (tx.type === 'expense') {
+          const amt = parseFloat(tx.amount) || 0;
           if (tx.payerKey === 'user1') {
-            u1Paid += tx.amount;
-            if (tx.splitMode === 'half') netDebt += (tx.amount / 2);
-            else if (tx.splitMode === 'full') netDebt += tx.amount;
+            u1Paid += amt;
+            if (tx.splitMode === 'half') netDebt += (amt / 2);
+            else if (tx.splitMode === 'full') netDebt += amt;
           } else if (tx.payerKey === 'user2') {
-            u2Paid += tx.amount;
-            if (tx.splitMode === 'half') netDebt -= (tx.amount / 2);
-            else if (tx.splitMode === 'full') netDebt -= tx.amount;
+            u2Paid += amt;
+            if (tx.splitMode === 'half') netDebt -= (amt / 2);
+            else if (tx.splitMode === 'full') netDebt -= amt;
           }
         } else if (tx.type === 'settle') {
-          if (tx.settlerKey === 'user2') netDebt -= tx.amount;
-          else if (tx.settlerKey === 'user1') netDebt += tx.amount;
+          const amt = parseFloat(tx.amount) || 0;
+          const settlerKey = tx.settlerKey || tx.payerKey;
+          const receiverKey = tx.receiverKey;
+          if (settlerKey === 'user2' || receiverKey === 'user1') {
+            netDebt -= amt;
+          } else if (settlerKey === 'user1' || receiverKey === 'user2') {
+            netDebt += amt;
+          }
         }
       });
 
@@ -2266,15 +2304,17 @@
       let html = '';
       recent.forEach(tx => {
         if (tx.type === 'settle') {
-          const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
-          const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+          const settlerKey = tx.settlerKey || tx.payerKey;
+          const receiverKey = tx.receiverKey || (settlerKey === 'user1' ? 'user2' : 'user1');
+          const settler = appConfig[settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+          const receiver = appConfig[receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
           html += `
             <div class="recent-row" style="background:rgba(6,214,160,0.08); border-color:rgba(6,214,160,0.25);">
               <div class="recent-left">
                 <span class="recent-icon">🤝</span>
                 <div>
                   <div class="recent-note" style="color:var(--accent-mint);">เคลียร์หนี้เรียบร้อย</div>
-                  <div class="recent-sub">${tx.dateStr} • ${settler.name} โอนให้ ${receiver.name}</div>
+                  <div class="recent-sub">${tx.dateStr} ${formatTimeStr(tx.timeStr)} • ${settler.name} โอนให้ ${receiver.name}</div>
                 </div>
               </div>
               <div class="recent-right">
@@ -2292,7 +2332,7 @@
                 <span class="recent-icon">${tx.catIcon || '💳'}</span>
                 <div>
                   <div class="recent-note">${escapeHtml(tx.note || tx.catName)}</div>
-                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${payer.name} (${splitLabel})</div>
+                  <div class="recent-sub">${tx.dateStr} ${formatTimeStr(tx.timeStr)} • ${payer.name} (${splitLabel})</div>
                 </div>
               </div>
               <div class="recent-right">
@@ -2320,15 +2360,17 @@
       let html = '';
       transactions.forEach(tx => {
         if (tx.type === 'settle') {
-          const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
-          const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+          const settlerKey = tx.settlerKey || tx.payerKey;
+          const receiverKey = tx.receiverKey || (settlerKey === 'user1' ? 'user2' : 'user1');
+          const settler = appConfig[settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+          const receiver = appConfig[receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
           html += `
             <div class="recent-row" style="background:rgba(6,214,160,0.08); padding:8px 12px; border-color:rgba(6,214,160,0.25);">
               <div class="recent-left">
                 <span class="recent-icon">🤝</span>
                 <div>
                   <div class="recent-note" style="color:var(--accent-mint);">เคลียร์หนี้เรียบร้อย</div>
-                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${settler.name} โอนให้ ${receiver.name}</div>
+                  <div class="recent-sub">${tx.dateStr} ${formatTimeStr(tx.timeStr)} • ${settler.name} โอนให้ ${receiver.name}</div>
                 </div>
               </div>
               <div class="recent-right">
@@ -2346,7 +2388,7 @@
                 <span class="recent-icon">${tx.catIcon || '💳'}</span>
                 <div>
                   <div class="recent-note">${escapeHtml(tx.note || tx.catName)}</div>
-                  <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${payer.name} (${splitLabel})</div>
+                  <div class="recent-sub">${tx.dateStr} ${formatTimeStr(tx.timeStr)} • ${payer.name} (${splitLabel})</div>
                 </div>
               </div>
               <div class="recent-right">
@@ -2436,9 +2478,13 @@
         dateStr: getTodayThaiDate(),
         timeStr: `${hh}:${mm}`,
         settlerKey,
+        payerKey: settlerKey,
         receiverKey,
         amount: amt,
         type: 'settle',
+        catIcon: '🤝',
+        catName: 'เคลียร์หนี้',
+        splitMode: 'settle',
         note: 'เคลียร์หนี้เรียบร้อย',
         timestamp: Date.now()
       };
@@ -2658,15 +2704,17 @@
 
       let html = '';
       settles.forEach(tx => {
-        const settler = appConfig[tx.settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
-        const receiver = appConfig[tx.receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
+        const settlerKey = tx.settlerKey || tx.payerKey;
+        const receiverKey = tx.receiverKey || (settlerKey === 'user1' ? 'user2' : 'user1');
+        const settler = appConfig[settlerKey] || { name: 'ผู้โอน', avatar: '👤' };
+        const receiver = appConfig[receiverKey] || { name: 'ผู้รับ', avatar: '👤' };
         html += `
           <div class="recent-row" style="background:rgba(6,214,160,0.08); padding:8px 12px; border-color:rgba(6,214,160,0.25);">
             <div class="recent-left">
               <span class="recent-icon">🤝</span>
               <div>
                 <div class="recent-note" style="color:var(--accent-mint); font-weight:600;">เคลียร์หนี้เรียบร้อย</div>
-                <div class="recent-sub">${tx.dateStr} ${tx.timeStr || ''} • ${settler.name} โอนให้ ${receiver.name}</div>
+                <div class="recent-sub">${tx.dateStr} ${formatTimeStr(tx.timeStr)} • ${settler.name} โอนให้ ${receiver.name}</div>
               </div>
             </div>
             <div class="recent-right">
@@ -2699,7 +2747,12 @@
 
             // ซิงค์รายการธุรกรรม (Requirement 6: แสดงผลเรียลไทม์)
             if (Array.isArray(data.transactions)) {
-              transactions = data.transactions;
+              transactions = data.transactions.map(t => {
+                if (t.type === 'settle' && !t.settlerKey) {
+                  t.settlerKey = t.payerKey;
+                }
+                return t;
+              });
               saveTransactions();
               renderAll();
             }
