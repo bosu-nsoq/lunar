@@ -848,6 +848,11 @@
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
+    @keyframes lunarPulse {
+      0% { transform: scale(0.94); opacity: 0.8; filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.3)); }
+      50% { transform: scale(1.10); opacity: 1; filter: drop-shadow(0 0 16px rgba(255, 209, 102, 0.75)); }
+      100% { transform: scale(0.94); opacity: 0.8; filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.3)); }
+    }
 
     .modal-head {
       display: flex;
@@ -1512,6 +1517,17 @@
       </div>
     </div>
 
+    <!-- ========================================================
+         MODAL: กำลังโหลด / กำลังล้างประวัติ (Requirement 1)
+         ======================================================== -->
+    <div id="modal-loading" class="modal-backdrop" style="align-items:center; justify-content:center; z-index:110;">
+      <div style="background:rgba(18, 20, 28, 0.94); border:1.5px solid var(--glass-border); border-radius:24px; padding:28px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px; box-shadow:0 12px 40px rgba(0,0,0,0.8); max-width:280px; width:85%; animation:fadeIn 0.2s ease-out;">
+        <div style="font-size:42px; animation:lunarPulse 1.2s infinite ease-in-out;">🌕</div>
+        <div style="font-size:15px; font-weight:700; color:var(--lunar-gold);" id="loading-title-txt">กำลังล้างประวัติรายการ...</div>
+        <div style="font-size:11.5px; color:var(--text-muted);" id="loading-sub-txt">กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ========================================================
@@ -1522,7 +1538,7 @@
     const STORAGE_KEY_ITEMS = 'lunar_app_items_v3';
 
     // Google Sheets Backend API Endpoint
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyzhRE8i1FfHLdxIzZn8xYw54XHjAMby9HPGWMspjhWF3tT0Pkyo5G3aOP9zfhyowLh/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxbRcx53530zo62jRMnN7kqGcEOVhudAf1gj-ISovEPB8-kvKRQY3790caWnFg-N9S4/exec';
 
     // Default configuration
     let appConfig = {
@@ -1865,9 +1881,9 @@
        ======================================================== */
     function addItemToBatch() {
       const amtInput = document.getElementById('in-amount');
-      const amount = parseFloat(amtInput.value);
+      const rawAmount = parseFloat(amtInput.value);
 
-      if (!amount || amount <= 0) {
+      if (!rawAmount || rawAmount <= 0) {
         showToast('กรุณาระบุจำนวนเงิน', '⚠️');
         amtInput.focus();
         return;
@@ -1878,6 +1894,12 @@
       const dateStr = document.getElementById('date-display').value || getTodayThaiDate();
       const timeStr = document.getElementById('time-input').value || '12:00';
 
+      // ถ้าเป็นจ่ายคนละครึ่ง ให้ระบบคิดยอดครึ่งหนึ่งทันที (Requirement 2: ไม่ต้องใส่ยอดเต็ม)
+      let finalAmount = rawAmount;
+      if (currentSplitMode === 'half') {
+        finalAmount = Math.round((rawAmount / 2) * 100) / 100;
+      }
+
       const tempItem = {
         tempId: 'batch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         dateStr,
@@ -1885,7 +1907,8 @@
         payerKey: appConfig.activeUserKey, // คนล็อกอินเป็นคนบันทึก
         catIcon: currentCategory.icon,
         catName: currentCategory.name,
-        amount,
+        amount: finalAmount,
+        rawAmount: rawAmount,
         splitMode: currentSplitMode,
         note
       };
@@ -1897,7 +1920,11 @@
       noteInput.value = '';
 
       renderBatch();
-      showToast(`➕ เพิ่ม "${tempItem.note}" ฿${tempItem.amount}`, '✨');
+      if (currentSplitMode === 'half') {
+        showToast(`➕ เพิ่ม "${tempItem.note}" ฿${tempItem.amount} (คนละครึ่ง)`, '✨');
+      } else {
+        showToast(`➕ เพิ่ม "${tempItem.note}" ฿${tempItem.amount}`, '✨');
+      }
     }
 
     function removeBatchItem(tempId) {
@@ -1929,7 +1956,10 @@
       let html = '';
       batchQueue.forEach((it) => {
         const payer = appConfig[it.payerKey] || { name: 'ผู้บันทึก', avatar: '👤' };
-        const splitLabel = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
+        let splitLabel = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
+        if (it.splitMode === 'half' && it.rawAmount && it.rawAmount !== it.amount) {
+          splitLabel = `จ่ายคนละครึ่ง (จาก ฿${it.rawAmount.toLocaleString()})`;
+        }
         html += `
           <div class="batch-item">
             <div class="batch-item-left">
@@ -1962,7 +1992,10 @@
 
       let html = '';
       batchQueue.forEach((it, idx) => {
-        const splitText = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
+        let splitText = it.splitMode === 'half' ? 'จ่ายคนละครึ่ง' : 'จ่ายเต็ม';
+        if (it.splitMode === 'half' && it.rawAmount && it.rawAmount !== it.amount) {
+          splitText = `จ่ายคนละครึ่ง (จากยอดเต็ม ฿${it.rawAmount.toLocaleString()})`;
+        }
         html += `
           <div class="confirm-review-row">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1999,7 +2032,8 @@
       let total = 0;
       items.forEach(it => {
         const itemTitle = it.note || it.catName;
-        msg += "• " + it.catIcon + " " + itemTitle + " : ฿" + it.amount.toLocaleString() + "\n";
+        const splitTag = (it.splitMode === 'half' && !itemTitle.includes('คนละครึ่ง')) ? ' (คนละครึ่ง)' : '';
+        msg += "• " + it.catIcon + " " + itemTitle + splitTag + " : ฿" + it.amount.toLocaleString() + "\n";
         total += it.amount;
       });
 
@@ -2201,12 +2235,10 @@
           const amt = parseFloat(tx.amount) || 0;
           if (tx.payerKey === 'user1') {
             u1Paid += amt;
-            if (tx.splitMode === 'half') netDebt += (amt / 2);
-            else if (tx.splitMode === 'full') netDebt += amt;
+            netDebt += amt;
           } else if (tx.payerKey === 'user2') {
             u2Paid += amt;
-            if (tx.splitMode === 'half') netDebt -= (amt / 2);
-            else if (tx.splitMode === 'full') netDebt -= amt;
+            netDebt -= amt;
           }
         } else if (tx.type === 'settle') {
           const amt = parseFloat(tx.amount) || 0;
@@ -2742,11 +2774,26 @@
        GOOGLE SHEETS / GOOGLE APPS SCRIPT REAL-TIME SYNC
        ======================================================== */
     let isFetchingGas = false;
+    let isClearingHistory = false;
     let gasSyncTimer = null;
+
+    function showLoadingModal(title = 'กำลังล้างประวัติรายการ...', sub = 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล') {
+      const modal = document.getElementById('modal-loading');
+      const tEl = document.getElementById('loading-title-txt');
+      const sEl = document.getElementById('loading-sub-txt');
+      if (tEl) tEl.textContent = title;
+      if (sEl) sEl.textContent = sub;
+      if (modal) modal.classList.add('active');
+    }
+
+    function hideLoadingModal() {
+      const modal = document.getElementById('modal-loading');
+      if (modal) modal.classList.remove('active');
+    }
 
     function fetchFromGas(silent = false, forceFresh = false) {
       if (!appConfig.gasUrl) return;
-      if (isFetchingGas) return; // ป้องกันการเรียกซ้ำซ้อนขณะรอข้อมูล
+      if (isFetchingGas || isClearingHistory) return; // ป้องกันการเรียกซ้ำซ้อนขณะรอข้อมูลหรือกำลังล้างประวัติ
 
       isFetchingGas = true;
       const freshParam = forceFresh ? '&fresh=1' : '';
@@ -2879,17 +2926,56 @@
       showToast('บันทึกข้อมูลและรหัส PIN เรียบร้อยแล้ว! 🌕', '💾');
     }
 
+    /* ล้างประวัติทั้งหมดอย่างสมูท พร้อมป๊อปอัพโหลดรอ (Requirement 1) */
     function confirmClearHistory() {
-      if (confirm('ต้องการล้างประวัติทั้งหมดใช่หรือไม่? (ยอดหนี้จะรีเซ็ตเป็น 0)')) {
+      if (!confirm('ต้องการล้างประวัติทั้งหมดใช่หรือไม่? (ยอดหนี้จะรีเซ็ตเป็น 0)')) return;
+
+      isClearingHistory = true;
+      showLoadingModal('กำลังล้างประวัติรายการ...', 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล');
+
+      if (!appConfig.gasUrl) {
         transactions = [];
         saveTransactions();
         renderAll();
-        showToast('ล้างประวัติเรียบร้อย', '🗑️');
-
-        if (appConfig.gasUrl) {
-          clearAllOnGas();
-        }
+        isClearingHistory = false;
+        hideLoadingModal();
+        showToast('ล้างประวัติเรียบร้อยแล้ว ✨', '🗑️');
+        return;
       }
+
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'clearHistory' })
+      })
+      .then(res => res.json())
+      .then(() => {
+        transactions = [];
+        saveTransactions();
+        renderAll();
+        // เรียกซิงค์แบบ fresh เพื่อยืนยันข้อมูลว่างเปล่าจริงจากเซิร์ฟเวอร์
+        return fetch(`${appConfig.gasUrl}?action=getAll&fresh=1&_t=${Date.now()}`, { cache: 'no-store' });
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.transactions)) {
+          transactions = data.transactions;
+          saveTransactions();
+          renderAll();
+        }
+        showToast('ล้างประวัติเรียบร้อยแล้ว ✨', '🗑️');
+      })
+      .catch(err => {
+        console.error('Clear history err:', err);
+        transactions = [];
+        saveTransactions();
+        renderAll();
+        showToast('ล้างประวัติเรียบร้อยแล้ว ✨', '🗑️');
+      })
+      .finally(() => {
+        isClearingHistory = false;
+        hideLoadingModal();
+      });
     }
 
     function showToast(msg, icon = '✨') {

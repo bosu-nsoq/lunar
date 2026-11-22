@@ -226,6 +226,7 @@ function doPost(e) {
           txSheet.deleteRows(2, lastRow - 1);
         }
       }
+      clearDataCache();
       return createJsonResponse({ status: "success", message: "All transactions cleared" });
     }
 
