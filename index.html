@@ -105,6 +105,10 @@
         height: 100dvh;
         max-height: 100dvh;
       }
+      .app-header {
+        padding-top: max(5px, calc(env(safe-area-inset-top, 0px) - 14px));
+        padding-bottom: 5px;
+      }
     }
 
     /* Glassmorphism Card Style (กระจกด้าน โปร่งใส) */
@@ -118,13 +122,13 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     }
 
-    /* Header Bar (ปรับระยะห่างด้านบนและขอบให้สมดุลพอดี ไม่ห่างหรือชิดเกินไป รองรับ Notch และ Dynamic Island) */
+    /* Header Bar (ปรับระยะห่างด้านบนและขอบให้กระชับ สมดุลพอดี ไม่ห่างหรือชิดเกินไป รองรับ Notch และ Dynamic Island) */
     .app-header {
       background: rgba(11, 12, 16, 0.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      padding-top: max(11px, calc(env(safe-area-inset-top, 0px) + 8px));
-      padding-bottom: 11px;
+      padding-top: max(6px, calc(env(safe-area-inset-top, 0px) - 12px));
+      padding-bottom: 6px;
       padding-left: max(16px, env(safe-area-inset-left, 16px));
       padding-right: max(16px, env(safe-area-inset-right, 16px));
       display: flex;
