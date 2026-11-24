@@ -2052,10 +2052,24 @@
       const encoded = encodeURIComponent(msg);
       const lineUrl = "https://line.me/R/msg/text/?" + encoded;
 
+      // ส่ง postMessage ไปยัง Parent (Bosu Hub) เผื่อในกรณีที่อยู่ใน iframe
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'BOSU_OPEN_LINE', url: lineUrl }, '*');
+        }
+      } catch (e) {}
+
+      // ตรวจสอบว่าเปิดผ่าน iframe (เช่น ใน Bosu Hub) หรือเปิดเดี่ยวๆ
+      const targetWindow = (window.top && window.top !== window.self) ? window.top : window;
+
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       if (isMobile) {
-        // ใช้ location.href ในหน้าเดิม เพื่อเปิดแอป LINE ทันทีโดยไม่เปิดแท็บเปล่าค้างหน้าขาว
-        window.location.href = lineUrl;
+        // นำทางผ่าน top window เพื่อให้ iOS/Android ตรวจจับ Universal Link เปิดแอป LINE ทันที
+        try {
+          targetWindow.location.href = lineUrl;
+        } catch (e) {
+          window.location.href = lineUrl;
+        }
       } else {
         window.open(lineUrl, '_blank');
       }
