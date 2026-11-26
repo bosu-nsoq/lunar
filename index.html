@@ -1518,12 +1518,12 @@
     </div>
 
     <!-- ========================================================
-         MODAL: กำลังโหลด / กำลังล้างประวัติ (Requirement 1)
+         MODAL: กำลังโหลด / กำลังบันทึกข้อมูล (Requirement 1)
          ======================================================== -->
     <div id="modal-loading" class="modal-backdrop" style="align-items:center; justify-content:center; z-index:110;">
       <div style="background:rgba(18, 20, 28, 0.94); border:1.5px solid var(--glass-border); border-radius:24px; padding:28px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px; box-shadow:0 12px 40px rgba(0,0,0,0.8); max-width:280px; width:85%; animation:fadeIn 0.2s ease-out;">
-        <div style="font-size:42px; animation:lunarPulse 1.2s infinite ease-in-out;">🌕</div>
-        <div style="font-size:15px; font-weight:700; color:var(--lunar-gold);" id="loading-title-txt">กำลังล้างประวัติรายการ...</div>
+        <div style="font-size:42px; animation:lunarPulse 1.2s infinite ease-in-out;" id="loading-icon-el">🌕</div>
+        <div style="font-size:15px; font-weight:700; color:var(--lunar-gold);" id="loading-title-txt">กำลังบันทึกรายการ...</div>
         <div style="font-size:11.5px; color:var(--text-muted);" id="loading-sub-txt">กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล</div>
       </div>
     </div>
@@ -2191,7 +2191,7 @@
       sendToLineApp(msg);
     }
 
-    /* ยืนยันบันทึกข้อมูลทั้งหมด (Requirement 2, 3, 10) */
+    /* ยืนยันบันทึกข้อมูลทั้งหมด (Requirement 1, 2, 3, 10) */
     function executeSubmitBatch() {
       if (batchQueue.length === 0) return;
 
@@ -2210,11 +2210,12 @@
         timestamp: now + idx
       }));
 
-      // Prepend to transactions
-      transactions = [...newItems, ...transactions];
-      saveTransactions();
+      // ปิดหน้าต่างตรวจสอบก่อนบันทึก
+      closeBatchConfirmModal();
 
-      const count = batchQueue.length;
+      // แสดงป๊อปอัพหน้าโหลดข้อมูลน่ารักๆ และล็อกการซิงค์พื้นหลัง (Requirement 1)
+      isClearingHistory = true;
+      showLoadingModal('กำลังบันทึกรายการ...', 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล ✨', '🌕');
 
       // เคลียร์ตะกร้าและช่องกรอกทั้งหมดอย่างสมบูรณ์ 100%
       batchQueue = [];
@@ -2222,18 +2223,54 @@
       document.getElementById('in-note').value = '';
       chooseCategory('🍛', 'อาหาร');
       setSplitMode('full');
-
       renderBatch();
-      renderAll();
-      closeBatchConfirmModal();
 
-      // แสดงหน้าต่างพร้อมปุ่มส่งยอดไปในไลน์ (Requirement 2 & 10)
-      openPostSubmitModal(newItems);
+      // บันทึกในเครื่องเป็นข้อมูลสำรองทันที
+      transactions = [...newItems, ...transactions];
+      saveTransactions();
 
-      // ซิงค์เข้า Google Sheets โดยไม่ส่งข้อความอัตโนมัติซ้ำ (Requirement 2)
-      if (appConfig.gasUrl) {
-        sendBatchToGas(newItems);
+      if (!appConfig.gasUrl) {
+        setTimeout(() => {
+          isClearingHistory = false;
+          hideLoadingModal();
+          renderAll();
+          openPostSubmitModal(newItems);
+          showToast('บันทึกข้อมูลเรียบร้อยแล้ว ✨', '✅');
+        }, 600);
+        return;
       }
+
+      // ซิงค์เข้า Google Sheets และรอโหลดข้อมูลเสร็จก่อนแสดงผล (Requirement 1)
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'addBatch', items: newItems })
+      })
+      .then(() => {
+        return fetch(`${appConfig.gasUrl}?action=getAll&fresh=1&_t=${Date.now()}`, { cache: 'no-store' })
+          .then(res => res.json())
+          .then(freshData => {
+            if (freshData && freshData.status === 'success' && Array.isArray(freshData.transactions)) {
+              transactions = freshData.transactions.map(t => {
+                if (t.type === 'settle' && !t.settlerKey) {
+                  t.settlerKey = t.payerKey;
+                }
+                return t;
+              });
+              saveTransactions();
+            }
+          });
+      })
+      .catch(err => {
+        console.error('GAS addBatch err:', err);
+      })
+      .finally(() => {
+        isClearingHistory = false;
+        hideLoadingModal();
+        renderAll(); // โหลดข้อมูลให้เสร็จ ค่อยแสดงข้อมูลที่เป็นปัจจุบัน
+        openPostSubmitModal(newItems); // แสดงหน้าต่างส่งยอดไปในไลน์
+        showToast('บันทึกข้อมูลเรียบร้อยแล้ว ✨', '✅');
+      });
     }
 
     /* ========================================================
@@ -2580,19 +2617,50 @@
         timestamp: Date.now()
       };
 
+      closeSettleModal();
+      isClearingHistory = true;
+      showLoadingModal('กำลังบันทึกเคลียร์หนี้...', 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล ✨', '🤝');
+
       transactions.unshift(settleTx);
       saveTransactions();
-      closeSettleModal();
-      renderAll();
 
-      showToast(`🎉 เคลียร์หนี้ ฿${amt.toLocaleString()} สำเร็จ!`, '🤝');
-
-      if (appConfig.gasUrl) {
-        sendSettleToGas(settleTx);
+      if (!appConfig.gasUrl) {
+        setTimeout(() => {
+          isClearingHistory = false;
+          hideLoadingModal();
+          renderAll();
+          showToast(`🎉 เคลียร์หนี้ ฿${amt.toLocaleString()} สำเร็จ!`, '🤝');
+          openPostSettleModal(settleTx);
+        }, 600);
+        return;
       }
 
-      // แสดงป๊อปอัพสำหรับส่งเข้าไลน์หลังเคลียร์หนี้ (Requirement 5)
-      openPostSettleModal(settleTx);
+      fetch(appConfig.gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'settleDebt', tx: settleTx })
+      })
+      .then(() => fetch(`${appConfig.gasUrl}?action=getAll&fresh=1&_t=${Date.now()}`, { cache: 'no-store' }))
+      .then(res => res.json())
+      .then(freshData => {
+        if (freshData && freshData.status === 'success' && Array.isArray(freshData.transactions)) {
+          transactions = freshData.transactions.map(t => {
+            if (t.type === 'settle' && !t.settlerKey) {
+              t.settlerKey = t.payerKey;
+            }
+            return t;
+          });
+          saveTransactions();
+        }
+      })
+      .catch(err => console.error('GAS settle err:', err))
+      .finally(() => {
+        isClearingHistory = false;
+        hideLoadingModal();
+        renderAll();
+        showToast(`🎉 เคลียร์หนี้ ฿${amt.toLocaleString()} สำเร็จ!`, '🤝');
+        openPostSettleModal(settleTx);
+      });
     }
 
     /* ========================================================
@@ -2831,12 +2899,14 @@
     let isClearingHistory = false;
     let gasSyncTimer = null;
 
-    function showLoadingModal(title = 'กำลังล้างประวัติรายการ...', sub = 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล') {
+    function showLoadingModal(title = 'กำลังบันทึกรายการ...', sub = 'กรุณารอสักครู่ ระบบกำลังอัปเดตข้อมูล', icon = '🌕') {
       const modal = document.getElementById('modal-loading');
       const tEl = document.getElementById('loading-title-txt');
       const sEl = document.getElementById('loading-sub-txt');
+      const iEl = document.getElementById('loading-icon-el');
       if (tEl) tEl.textContent = title;
       if (sEl) sEl.textContent = sub;
+      if (iEl && icon) iEl.textContent = icon;
       if (modal) modal.classList.add('active');
     }
 
